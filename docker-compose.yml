@@ -67,6 +67,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      
+  # SOAP API Unsecure
+  soap-api-unsecure:
+    build:
+      context: ./soap-api-unsecure
+      dockerfile: Dockerfile
+    container_name: soap-api-unsecure
+    ports:
+      - "8084:8084"
+    networks:
+      - taskscheduler3-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8084/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   taskscheduler3-network:
