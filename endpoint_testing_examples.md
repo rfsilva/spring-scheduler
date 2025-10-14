@@ -165,6 +165,202 @@ curl -X GET "https://api.openweathermap.org/data/2.5/weather?q=Sao%20Paulo,br&ap
 }
 ```
 
+## Testando API REST Não Segura
+
+### 1. Verificar Status da API
+
+**Usando curl:**
+
+```bash
+curl -X GET http://localhost:8081/api/health
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "status": "UP",
+  "service": "Unsecure REST API"
+}
+```
+
+### 2. Listar Tarefas
+
+**Usando curl:**
+
+```bash
+curl -X GET http://localhost:8081/api/tasks
+```
+
+**Resposta esperada:**
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Implementar API",
+    "description": "Criar endpoints REST",
+    "completed": true,
+    "createdAt": "2023-01-15T10:00:00",
+    "updatedAt": "2023-01-15T14:30:00"
+  },
+  {
+    "id": 2,
+    "title": "Testar API",
+    "description": "Realizar testes de integração",
+    "completed": false,
+    "createdAt": "2023-01-16T09:00:00",
+    "updatedAt": "2023-01-16T09:00:00"
+  }
+]
+```
+
+### 3. Criar Nova Tarefa
+
+**Usando curl:**
+
+```bash
+curl -X POST http://localhost:8081/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Nova Tarefa", "description": "Descrição da nova tarefa", "completed": false}'
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "id": 3,
+  "title": "Nova Tarefa",
+  "description": "Descrição da nova tarefa",
+  "completed": false,
+  "createdAt": "2023-05-20T15:30:45.123",
+  "updatedAt": "2023-05-20T15:30:45.123"
+}
+```
+
+## Testando API REST Segura (com H2 Database)
+
+### 1. Verificar Status da API
+
+**Usando curl:**
+
+```bash
+curl -X GET http://localhost:8082/api/health
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "status": "UP",
+  "service": "Secure REST API"
+}
+```
+
+### 2. Autenticar e Obter Token JWT
+
+**Usando curl:**
+
+```bash
+curl -X POST http://localhost:8082/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username": "user", "password": "password"}'
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9...",
+  "type": "Bearer",
+  "id": 1,
+  "username": "user",
+  "email": "user@example.com",
+  "roles": ["USER"]
+}
+```
+
+### 3. Listar Tarefas (Autenticado)
+
+**Usando curl (substitua YOUR_JWT_TOKEN pelo token obtido no passo anterior):**
+
+```bash
+curl -X GET http://localhost:8082/api/tasks \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+**Resposta esperada:**
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Implement authentication",
+    "description": "Add JWT authentication to the API",
+    "completed": true,
+    "createdAt": "2023-05-20T10:00:00",
+    "updatedAt": "2023-05-20T14:30:00"
+  },
+  {
+    "id": 2,
+    "title": "Create task endpoints",
+    "description": "Implement CRUD operations for tasks",
+    "completed": true,
+    "createdAt": "2023-05-21T09:00:00",
+    "updatedAt": "2023-05-21T11:45:00"
+  }
+]
+```
+
+### 4. Criar Nova Tarefa (Autenticado)
+
+**Usando curl (substitua YOUR_JWT_TOKEN pelo token obtido anteriormente):**
+
+```bash
+curl -X POST http://localhost:8082/api/tasks \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"title": "Nova Tarefa Segura", "description": "Descrição da nova tarefa segura", "completed": false}'
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "id": 6,
+  "title": "Nova Tarefa Segura",
+  "description": "Descrição da nova tarefa segura",
+  "completed": false,
+  "createdAt": "2023-05-20T16:45:30.123",
+  "updatedAt": "2023-05-20T16:45:30.123"
+}
+```
+
+### 5. Registrar Novo Usuário
+
+**Usando curl:**
+
+```bash
+curl -X POST http://localhost:8082/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username": "newuser", "email": "newuser@example.com", "password": "password123", "roles": ["USER"]}'
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "message": "User registered successfully!"
+}
+```
+
+### 6. Acessar o Console H2
+
+O console H2 está disponível em `http://localhost:8082/api/h2-console` com as seguintes credenciais:
+- JDBC URL: jdbc:h2:mem:securedb
+- Username: sa
+- Password: password
+
 ## Testando Endpoints SOAP
 
 ### 1. Calculator SOAP Service
@@ -281,6 +477,9 @@ Para testar os serviços REST com Postman:
    - GET `https://brasilapi.com.br/api/feriados/v1/2023`
    - GET `https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL`
    - GET `https://api.openweathermap.org/data/2.5/weather?q=Sao%20Paulo,br&appid=YOUR_API_KEY`
+   - GET `http://localhost:8081/api/tasks` (API REST não segura)
+   - POST `http://localhost:8082/api/auth/login` (API REST segura - autenticação)
+   - GET `http://localhost:8082/api/tasks` (API REST segura - com token JWT)
 3. Execute as requisições e verifique as respostas
 
 Para testar os serviços SOAP com Postman:

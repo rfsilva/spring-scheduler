@@ -42,6 +42,8 @@ echo.
 echo Resumo dos dados importados:
 echo - 7 tarefas agendadas (4 REST e 3 SOAP)
 echo - 18 execucoes de tarefas para historico
+echo - API REST nao segura usa banco de dados H2 em memoria com dados pre-carregados
+echo - API REST segura usa banco de dados H2 em memoria com dados pre-carregados
 echo.
 echo Para testar os endpoints, consulte o arquivo endpoint_testing_examples.md
 echo Para mais informacoes, consulte o arquivo test_data_README.md

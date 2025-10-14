@@ -1,6 +1,6 @@
-package com.example.api.repository;
+package com.example.api.secure.repository;
 
-import com.example.api.model.Task;
+import com.example.api.secure.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
