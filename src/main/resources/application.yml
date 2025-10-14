@@ -56,6 +56,16 @@ spring:
       # Outras configurações
       org.quartz.scheduler.wrapJobExecutionInUserTransaction: false
 
+  # ==============================================
+  # CORS CONFIGURATION
+  # ==============================================
+  web:
+    cors:
+      allowed-origins: "http://localhost:4200"
+      allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
+
 # ==============================================
 # SERVER CONFIGURATION
 # ==============================================
@@ -64,6 +74,21 @@ server:
   servlet:
     context-path: /api
   shutdown: graceful
+
+# ==============================================
+# SPRINGDOC/SWAGGER CONFIGURATION
+# ==============================================
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    disable-swagger-default-url: true
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: true
+  packages-to-scan: com.taskscheduler.controller
+  paths-to-match: /**
 
 # ==============================================
 # LOGGING CONFIGURATION

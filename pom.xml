@@ -13,7 +13,7 @@
     <groupId>com.taskscheduler</groupId>
     <artifactId>task-scheduler</artifactId>
     <version>1.0.0</version>
-    <name>task-scheduler</name>
+    <n>task-scheduler</n>
     <description>Task Scheduler and Executor System</description>
     
     <properties>
@@ -58,6 +58,13 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
+        </dependency>
+        
+        <!-- Swagger/OpenAPI Documentation -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.3.0</version>
         </dependency>
         
         <!-- Utilities -->

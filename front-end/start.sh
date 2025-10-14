@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Install dependencies
+# Instalar dependências
 npm install
 
-# Start development server
+# Iniciar o servidor de desenvolvimento com proxy
 npm start

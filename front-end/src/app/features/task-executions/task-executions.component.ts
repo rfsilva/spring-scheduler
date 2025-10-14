@@ -1,31 +1,63 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { TaskExecutionService } from '../../core/services/task-execution.service';
 import { TaskService } from '../../core/services/task.service';
 import { TaskExecution } from '../../core/models/task-execution.model';
-import { ScheduledTask } from '../../core/models/scheduled-task.model';
+import { ScheduledTask, TaskStatus } from '../../core/models/scheduled-task.model';
+import { format } from 'date-fns';
 
 @Component({
   selector: 'app-task-executions',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatExpansionModule,
+    MatChipsModule,
+    MatTooltipModule,
+    MatDialogModule
+  ],
   templateUrl: './task-executions.component.html',
   styleUrls: ['./task-executions.component.scss']
 })
-export class TaskExecutionsComponent implements OnInit {
+export class TaskExecutionsComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['id', 'startTime', 'endTime', 'status', 'durationMs', 'retryCount', 'actions'];
   dataSource = new MatTableDataSource<TaskExecution>([]);
-  task: ScheduledTask | null = null;
-  loading = true;
-  error = false;
+  task?: ScheduledTask;
   taskId!: number;
-  totalElements = 0;
-  pageSize = 10;
-  pageSizeOptions = [5, 10, 25, 50];
-  dateRangeForm: FormGroup;
+  loading = true;
   showDateFilter = false;
+  dateFilterForm: FormGroup;
+  selectedExecution?: TaskExecution;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -37,7 +69,7 @@ export class TaskExecutionsComponent implements OnInit {
     private router: Router,
     private fb: FormBuilder
   ) {
-    this.dateRangeForm = this.fb.group({
+    this.dateFilterForm = this.fb.group({
       startDate: [''],
       endDate: ['']
     });
@@ -54,73 +86,51 @@ export class TaskExecutionsComponent implements OnInit {
     });
   }
 
-  ngAfterViewInit() {
-    this.paginator.page.subscribe(() => {
-      this.loadExecutions();
-    });
-    
-    this.sort.sortChange.subscribe(() => {
-      this.paginator.pageIndex = 0;
-      this.loadExecutions();
-    });
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   loadTask(): void {
     this.taskService.getTaskById(this.taskId).subscribe({
       next: (task) => {
         this.task = task;
-      },
-      error: (err) => {
-        console.error('Error loading task', err);
       }
     });
   }
 
   loadExecutions(): void {
     this.loading = true;
-    this.error = false;
-    
-    const page = this.paginator ? this.paginator.pageIndex : 0;
-    const size = this.paginator ? this.paginator.pageSize : this.pageSize;
-    let sort = '';
-    
-    if (this.sort && this.sort.active && this.sort.direction) {
-      sort = `${this.sort.active},${this.sort.direction}`;
-    }
-    
-    this.taskExecutionService.getTaskExecutionHistoryPaged(this.taskId, page, size, sort).subscribe({
-      next: (response) => {
-        this.dataSource.data = response.content;
-        this.totalElements = response.totalElements;
+    this.taskExecutionService.getTaskExecutionHistory(this.taskId).subscribe({
+      next: (executions) => {
+        this.dataSource.data = executions;
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error loading executions', err);
-        this.error = true;
+      error: () => {
         this.loading = false;
       }
     });
   }
 
+  toggleDateFilter(): void {
+    this.showDateFilter = !this.showDateFilter;
+  }
+
   applyDateFilter(): void {
-    const startDate = this.dateRangeForm.get('startDate')?.value;
-    const endDate = this.dateRangeForm.get('endDate')?.value;
+    const startDate = this.dateFilterForm.get('startDate')?.value;
+    const endDate = this.dateFilterForm.get('endDate')?.value;
     
     if (startDate && endDate) {
+      const startIso = format(startDate, "yyyy-MM-dd'T'00:00:00");
+      const endIso = format(endDate, "yyyy-MM-dd'T'23:59:59");
+      
       this.loading = true;
-      this.error = false;
-      
-      const start = new Date(startDate).toISOString();
-      const end = new Date(endDate).toISOString();
-      
-      this.taskExecutionService.getTaskExecutionHistoryByDateRange(this.taskId, start, end).subscribe({
+      this.taskExecutionService.getTaskExecutionHistoryByDateRange(this.taskId, startIso, endIso).subscribe({
         next: (executions) => {
           this.dataSource.data = executions;
           this.loading = false;
         },
-        error: (err) => {
-          console.error('Error loading executions by date range', err);
-          this.error = true;
+        error: () => {
           this.loading = false;
         }
       });
@@ -128,27 +138,32 @@ export class TaskExecutionsComponent implements OnInit {
   }
 
   resetDateFilter(): void {
-    this.dateRangeForm.reset();
+    this.dateFilterForm.reset();
     this.loadExecutions();
-  }
-
-  toggleDateFilter(): void {
-    this.showDateFilter = !this.showDateFilter;
-    if (!this.showDateFilter) {
-      this.resetDateFilter();
-    }
-  }
-
-  viewExecutionDetails(execution: TaskExecution): void {
-    // In a real application, you might want to show execution details in a dialog or a separate page
-    console.log('View execution details', execution);
-  }
-
-  getStatusClass(status: string): string {
-    return `status-${status.toLowerCase()}`;
   }
 
   goBack(): void {
     this.router.navigate(['/tasks', this.taskId]);
+  }
+
+  viewExecutionDetails(execution: TaskExecution): void {
+    this.selectedExecution = execution;
+  }
+
+  getStatusClass(status: string): string {
+    switch (status) {
+      case TaskStatus.ACTIVE:
+        return 'status-active';
+      case TaskStatus.INACTIVE:
+        return 'status-inactive';
+      case TaskStatus.EXECUTING:
+        return 'status-executing';
+      case TaskStatus.COMPLETED:
+        return 'status-completed';
+      case TaskStatus.FAILED:
+        return 'status-failed';
+      default:
+        return '';
+    }
   }
 }

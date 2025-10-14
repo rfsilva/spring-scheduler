@@ -1,24 +1,51 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
-import { MatSort } from '@angular/material/sort';
-import { MatDialog } from '@angular/material/dialog';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatSort, MatSortModule } from '@angular/material/sort';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatChipsModule } from '@angular/material/chips';
 import { TaskService } from '../../../core/services/task.service';
-import { ScheduledTask, TaskStatus } from '../../../core/models/scheduled-task.model';
-import { ConfirmDialogComponent } from '../../../shared/confirm-dialog/confirm-dialog.component';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { ScheduledTask, TaskStatus, TaskType } from '../../../core/models/scheduled-task.model';
+import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-task-list',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatProgressSpinnerModule,
+    MatDialogModule,
+    MatSnackBarModule,
+    MatChipsModule
+  ],
   templateUrl: './task-list.component.html',
   styleUrls: ['./task-list.component.scss']
 })
-export class TaskListComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'taskType', 'status', 'cronExpression', 'actions'];
+export class TaskListComponent implements OnInit, AfterViewInit {
+  displayedColumns: string[] = ['id', 'name', 'taskType', 'status', 'cronExpression', 'actions'];
   dataSource = new MatTableDataSource<ScheduledTask>([]);
   loading = true;
-  error = false;
+  TaskType = TaskType;
+  TaskStatus = TaskStatus;
 
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
@@ -32,22 +59,19 @@ export class TaskListComponent implements OnInit {
     this.loadTasks();
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
 
   loadTasks(): void {
     this.loading = true;
-    this.error = false;
-    
     this.taskService.getAllTasks().subscribe({
       next: (tasks) => {
         this.dataSource.data = tasks;
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error loading tasks', err);
-        this.error = true;
+      error: () => {
         this.loading = false;
       }
     });
@@ -56,6 +80,14 @@ export class TaskListComponent implements OnInit {
   applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  createTask(): void {
+    this.router.navigate(['/tasks/new']);
   }
 
   viewTask(id: number): void {
@@ -71,54 +103,38 @@ export class TaskListComponent implements OnInit {
   }
 
   activateTask(task: ScheduledTask): void {
-    if (!task.id) return;
-    
-    this.taskService.activateTask(task.id).subscribe({
+    this.taskService.activateTask(task.id!).subscribe({
       next: (updatedTask) => {
         const index = this.dataSource.data.findIndex(t => t.id === task.id);
         if (index !== -1) {
-          const updatedData = [...this.dataSource.data];
-          updatedData[index] = updatedTask;
-          this.dataSource.data = updatedData;
+          this.dataSource.data[index] = updatedTask;
+          this.dataSource._updateChangeSubscription();
         }
-        this.snackBar.open('Task activated successfully', 'Close', { duration: 3000 });
-      },
-      error: (err) => {
-        console.error('Error activating task', err);
-        this.snackBar.open('Failed to activate task', 'Close', { duration: 3000 });
+        this.snackBar.open('Tarefa ativada com sucesso', 'Fechar', { duration: 3000 });
       }
     });
   }
 
   deactivateTask(task: ScheduledTask): void {
-    if (!task.id) return;
-    
-    this.taskService.deactivateTask(task.id).subscribe({
+    this.taskService.deactivateTask(task.id!).subscribe({
       next: (updatedTask) => {
         const index = this.dataSource.data.findIndex(t => t.id === task.id);
         if (index !== -1) {
-          const updatedData = [...this.dataSource.data];
-          updatedData[index] = updatedTask;
-          this.dataSource.data = updatedData;
+          this.dataSource.data[index] = updatedTask;
+          this.dataSource._updateChangeSubscription();
         }
-        this.snackBar.open('Task deactivated successfully', 'Close', { duration: 3000 });
-      },
-      error: (err) => {
-        console.error('Error deactivating task', err);
-        this.snackBar.open('Failed to deactivate task', 'Close', { duration: 3000 });
+        this.snackBar.open('Tarefa desativada com sucesso', 'Fechar', { duration: 3000 });
       }
     });
   }
 
   deleteTask(task: ScheduledTask): void {
-    if (!task.id) return;
-    
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Confirm Delete',
-        message: `Are you sure you want to delete the task "${task.name}"?`,
-        confirmButtonText: 'Delete',
-        cancelButtonText: 'Cancel'
+        title: 'Confirmar exclusão',
+        message: `Tem certeza que deseja excluir a tarefa "${task.name}"?`,
+        confirmButtonText: 'Excluir',
+        cancelButtonText: 'Cancelar'
       }
     });
 
@@ -127,22 +143,27 @@ export class TaskListComponent implements OnInit {
         this.taskService.deleteTask(task.id!).subscribe({
           next: () => {
             this.dataSource.data = this.dataSource.data.filter(t => t.id !== task.id);
-            this.snackBar.open('Task deleted successfully', 'Close', { duration: 3000 });
-          },
-          error: (err) => {
-            console.error('Error deleting task', err);
-            this.snackBar.open('Failed to delete task', 'Close', { duration: 3000 });
+            this.snackBar.open('Tarefa excluída com sucesso', 'Fechar', { duration: 3000 });
           }
         });
       }
     });
   }
 
-  createTask(): void {
-    this.router.navigate(['/tasks/new']);
-  }
-
   getStatusClass(status: TaskStatus): string {
-    return `status-${status.toLowerCase()}`;
+    switch (status) {
+      case TaskStatus.ACTIVE:
+        return 'status-active';
+      case TaskStatus.INACTIVE:
+        return 'status-inactive';
+      case TaskStatus.EXECUTING:
+        return 'status-executing';
+      case TaskStatus.COMPLETED:
+        return 'status-completed';
+      case TaskStatus.FAILED:
+        return 'status-failed';
+      default:
+        return '';
+    }
   }
 }

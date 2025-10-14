@@ -220,22 +220,14 @@ else
     else
       jarUrl="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.1.0/maven-wrapper-3.1.0.jar"
     fi
-    while [ "$wrapperJarPath" = "" ]
-    do
-      # Find the maven-wrapper.jar file
-      wrapperJarPath=`find "$BASE_DIR" -name maven-wrapper.jar -print`
-      if [ "$wrapperJarPath" != "" ]; then
-          if [ "$MVNW_VERBOSE" = true ]; then
-            echo "Found $wrapperJarPath"
-          fi
-      else
-        if [ "$MVNW_VERBOSE" = true ]; then
-          echo "Falling back to using Java to download"
-        fi
-        javaClass="$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"
+    wrapperJarPath="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
+    
+    if [ -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java" ]; then
         # For Cygwin, switch paths to Windows format before running javac
         if $cygwin; then
-          javaClass=`cygpath --path --windows "$javaClass"`
+          javaClass=`cygpath --path --windows "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"`
+        else
+          javaClass="$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"
         fi
         if [ -e "$javaClass" ]; then
             if [ ! -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
@@ -243,17 +235,55 @@ else
                   echo " - Compiling MavenWrapperDownloader.java ..."
                 fi
                 # Compiling the Java class
-                ("$JAVACMD" "$jvmConfig" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
+                ("$JAVACMD" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
             fi
             if [ -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
                 # Running the downloader
                 if [ "$MVNW_VERBOSE" = true ]; then
                   echo " - Running MavenWrapperDownloader.java ..."
                 fi
-                ("$JAVACMD" "$jvmConfig" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
+                ("$JAVACMD" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
             fi
         fi
-    done
+    else
+        if [ "$MVNW_VERBOSE" = true ]; then
+          echo " - Downloading from: $jarUrl"
+        fi
+        wrapperJarPath="$BASE_DIR/.mvn/wrapper/maven-wrapper.jar"
+        
+        if command -v wget > /dev/null; then
+            if [ "$MVNW_VERBOSE" = true ]; then
+              echo "Found wget ... using wget"
+            fi
+            wget "$jarUrl" -O "$wrapperJarPath"
+        elif command -v curl > /dev/null; then
+            if [ "$MVNW_VERBOSE" = true ]; then
+              echo "Found curl ... using curl"
+            fi
+            curl -o "$wrapperJarPath" "$jarUrl" -f
+        else
+            if [ "$MVNW_VERBOSE" = true ]; then
+              echo "Falling back to using Java to download"
+            fi
+            javaClass="$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.java"
+            if [ -e "$javaClass" ]; then
+                if [ ! -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
+                    if [ "$MVNW_VERBOSE" = true ]; then
+                      echo " - Compiling MavenWrapperDownloader.java ..."
+                    fi
+                    # Compiling the Java class
+                    ("$JAVACMD" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
+                fi
+                if [ -e "$BASE_DIR/.mvn/wrapper/MavenWrapperDownloader.class" ]; then
+                    # Running the downloader
+                    if [ "$MVNW_VERBOSE" = true ]; then
+                      echo " - Running MavenWrapperDownloader.java ..."
+                    fi
+                    ("$JAVACMD" -cp .mvn/wrapper MavenWrapperDownloader "$MAVEN_PROJECTBASEDIR")
+                fi
+            fi
+        fi
+    fi
 fi
 ##########################################################################################
 # End of extension

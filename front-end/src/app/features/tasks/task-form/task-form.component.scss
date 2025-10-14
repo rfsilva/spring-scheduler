@@ -1,36 +1,57 @@
 .task-form-container {
-  padding: 20px 0;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  h1 {
+    margin: 0 0 0 8px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.form-card {
+  margin-bottom: 20px;
 }
 
 .form-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-
-.form-field {
-  flex: 1;
-  min-width: 200px;
-}
-
-.full-width {
-  flex-basis: 100%;
-}
-
-.config-card {
-  margin-top: 20px;
+  margin-bottom: 16px;
+  
+  mat-form-field {
+    width: 100%;
+  }
+  
+  &.two-columns {
+    display: flex;
+    gap: 16px;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
 }
 
 .form-actions {
-  margin-top: 20px;
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-}
-
-.spinner-button {
-  display: inline-block;
-  margin-right: 8px;
-  vertical-align: middle;
+  gap: 16px;
+  margin-top: 20px;
+  margin-bottom: 40px;
+  
+  button {
+    min-width: 120px;
+    
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
 }

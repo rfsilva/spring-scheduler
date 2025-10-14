@@ -1,57 +1,64 @@
 # Task Scheduler Frontend
 
-This is the frontend application for the Task Scheduler system, built with Angular 18.
+Este é o frontend para a aplicação Task Scheduler, desenvolvido com Angular 18 e Angular Material.
 
-## Prerequisites
+## Requisitos
 
-- Node.js (v16 or higher)
-- npm (v8 or higher)
+- Node.js 18+
+- npm 9+
 
-## Installation
+## Instalação
 
 ```bash
 npm install
 ```
 
-## Development server
+## Desenvolvimento
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Para iniciar o servidor de desenvolvimento:
+
+```bash
+npm start
+```
+
+A aplicação estará disponível em `http://localhost:4200/`.
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Para gerar uma build de produção:
+
+```bash
+npm run build
+```
+
+Os arquivos de build serão gerados na pasta `dist/`.
 
 ## Docker
 
-To build and run the application using Docker:
+Para construir a imagem Docker:
 
 ```bash
-# Build the Docker image
 docker build -t task-scheduler-frontend .
+```
 
-# Run the container
+Para executar o container:
+
+```bash
 docker run -p 80:80 task-scheduler-frontend
 ```
 
-## Features
+## Estrutura do Projeto
 
-- Dashboard with task statistics
-- Task management (create, read, update, delete)
-- Task activation/deactivation
-- Task execution history
-- Filtering and sorting capabilities
+- `src/app/core`: Serviços, modelos e interceptors principais
+- `src/app/features`: Componentes de funcionalidades (dashboard, tarefas, execuções)
+- `src/app/layout`: Componentes de layout (header, sidenav)
+- `src/app/shared`: Componentes compartilhados
 
-## Project Structure
+## Funcionalidades
 
-- `src/app/core`: Core functionality (models, services, interceptors)
-- `src/app/shared`: Shared components and utilities
-- `src/app/features`: Feature modules (dashboard, tasks, executions)
-- `src/app/layout`: Layout components (header, sidenav)
-
-## OAuth2 Integration
-
-OAuth2 authentication is prepared but currently disabled. To enable it:
-
-1. Uncomment the OAuth2 related code in `src/app/core/interceptors/api.interceptor.ts`
-2. Uncomment the user menu in `src/app/layout/header/header.component.html`
-3. Implement an authentication service
+- Dashboard com visão geral das tarefas
+- Listagem de tarefas agendadas
+- Criação e edição de tarefas
+- Visualização de detalhes das tarefas
+- Histórico de execuções de tarefas
+- Ativação/desativação de tarefas

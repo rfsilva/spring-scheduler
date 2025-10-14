@@ -8,12 +8,12 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class TaskExecutionService {
-  private apiUrl = `${environment.apiUrl}/tasks`;
+  private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
   getTaskExecutionHistory(taskId: number): Observable<TaskExecution[]> {
-    return this.http.get<TaskExecution[]>(`${this.apiUrl}/${taskId}/executions`);
+    return this.http.get<TaskExecution[]>(`${this.baseUrl}/tasks/${taskId}/executions`);
   }
 
   getTaskExecutionHistoryPaged(taskId: number, page: number, size: number, sort?: string): Observable<any> {
@@ -25,14 +25,14 @@ export class TaskExecutionService {
       params = params.set('sort', sort);
     }
     
-    return this.http.get<any>(`${this.apiUrl}/${taskId}/executions/paged`, { params });
+    return this.http.get<any>(`${this.baseUrl}/tasks/${taskId}/executions/paged`, { params });
   }
 
   getTaskExecutionHistoryByDateRange(taskId: number, start: string, end: string): Observable<TaskExecution[]> {
-    let params = new HttpParams()
+    const params = new HttpParams()
       .set('start', start)
       .set('end', end);
     
-    return this.http.get<TaskExecution[]>(`${this.apiUrl}/${taskId}/executions/date-range`, { params });
+    return this.http.get<TaskExecution[]>(`${this.baseUrl}/tasks/${taskId}/executions/date-range`, { params });
   }
 }

@@ -1,229 +1,207 @@
 <div class="task-detail-container">
-  <div class="page-header">
-    <div class="page-title">
-      <button mat-icon-button (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-      <h1>Task Details</h1>
+  <div class="header">
+    <button mat-icon-button (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Detalhes da Tarefa</h1>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
     </div>
-    <div class="action-buttons">
-      <button mat-raised-button color="primary" (click)="editTask()">
-        <mat-icon>edit</mat-icon>
-        Edit
-      </button>
-      <button mat-raised-button color="accent" (click)="viewExecutions()">
-        <mat-icon>history</mat-icon>
-        Executions
-      </button>
-      <button *ngIf="task?.status === 'INACTIVE'" mat-raised-button color="primary" (click)="activateTask()">
-        <mat-icon>play_arrow</mat-icon>
-        Activate
-      </button>
-      <button *ngIf="task?.status === 'ACTIVE'" mat-raised-button color="warn" (click)="deactivateTask()">
-        <mat-icon>pause</mat-icon>
-        Deactivate
-      </button>
-      <button mat-raised-button color="warn" (click)="deleteTask()">
-        <mat-icon>delete</mat-icon>
-        Delete
-      </button>
-    </div>
-  </div>
-
-  <div *ngIf="loading" class="loading-spinner">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
-
-  <div *ngIf="error" class="error-message">
-    <p>Failed to load task details. Please try again later.</p>
-    <button mat-raised-button color="primary" (click)="loadTask()">Retry</button>
-  </div>
-
-  <div *ngIf="!loading && !error && task">
-    <mat-card>
+  } @else if (task) {
+    <mat-card class="task-card">
       <mat-card-header>
         <mat-card-title>{{ task.name }}</mat-card-title>
         <mat-card-subtitle>
-          <span [ngClass]="getStatusClass()">{{ task.status }}</span>
+          <span class="status-chip" [ngClass]="getStatusClass()">{{ task.status }}</span>
+          <span class="task-type">{{ task.taskType }}</span>
         </mat-card-subtitle>
       </mat-card-header>
+      
       <mat-card-content>
-        <div class="task-info">
-          <div class="info-row">
-            <span class="info-label">Description:</span>
-            <span class="info-value">{{ task.description }}</span>
+        <div class="detail-section">
+          <h3>Informações Básicas</h3>
+          <div class="detail-row">
+            <span class="label">ID:</span>
+            <span>{{ task.id }}</span>
           </div>
-          <div class="info-row">
-            <span class="info-label">Task Type:</span>
-            <span class="info-value">{{ task.taskType }}</span>
+          <div class="detail-row">
+            <span class="label">Descrição:</span>
+            <span>{{ task.description }}</span>
           </div>
-          <div class="info-row">
-            <span class="info-label">Cron Expression:</span>
-            <span class="info-value">{{ task.cronExpression }}</span>
+          <div class="detail-row">
+            <span class="label">Expressão Cron:</span>
+            <span>{{ task.cronExpression }}</span>
           </div>
-          <div class="info-row" *ngIf="task.maxRetries !== null && task.maxRetries !== undefined">
-            <span class="info-label">Max Retries:</span>
-            <span class="info-value">{{ task.maxRetries }}</span>
+          <div class="detail-row">
+            <span class="label">Máximo de Tentativas:</span>
+            <span>{{ task.maxRetries || 'Não definido' }}</span>
           </div>
-          <div class="info-row" *ngIf="task.retryDelaySeconds !== null && task.retryDelaySeconds !== undefined">
-            <span class="info-label">Retry Delay:</span>
-            <span class="info-value">{{ task.retryDelaySeconds }} seconds</span>
+          <div class="detail-row">
+            <span class="label">Atraso entre Tentativas (segundos):</span>
+            <span>{{ task.retryDelaySeconds || 'Não definido' }}</span>
           </div>
         </div>
 
+        <mat-divider></mat-divider>
+
         <!-- REST Task Config -->
-        <mat-expansion-panel *ngIf="task.restTaskConfig">
-          <mat-expansion-panel-header>
-            <mat-panel-title>REST Task Configuration</mat-panel-title>
-          </mat-expansion-panel-header>
-          <div class="task-config">
-            <div class="info-row">
-              <span class="info-label">URL:</span>
-              <span class="info-value">{{ task.restTaskConfig.url }}</span>
+        @if (task.taskType === 'REST_CALL' && task.restTaskConfig) {
+          <div class="detail-section">
+            <h3>Configuração REST</h3>
+            <div class="detail-row">
+              <span class="label">URL:</span>
+              <span>{{ task.restTaskConfig.url }}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Method:</span>
-              <span class="info-value">{{ task.restTaskConfig.method }}</span>
+            <div class="detail-row">
+              <span class="label">Método:</span>
+              <span>{{ task.restTaskConfig.method }}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Auth Type:</span>
-              <span class="info-value">{{ task.restTaskConfig.authType }}</span>
+            <div class="detail-row">
+              <span class="label">Tipo de Autenticação:</span>
+              <span>{{ task.restTaskConfig.authType }}</span>
             </div>
-            <div class="info-row" *ngIf="task.restTaskConfig.headers">
-              <span class="info-label">Headers:</span>
-              <pre class="info-value code-block">{{ task.restTaskConfig.headers }}</pre>
-            </div>
-            <div class="info-row" *ngIf="task.restTaskConfig.body">
-              <span class="info-label">Body:</span>
-              <pre class="info-value code-block">{{ task.restTaskConfig.body }}</pre>
-            </div>
-            <div class="info-row" *ngIf="task.restTaskConfig.connectTimeoutSeconds">
-              <span class="info-label">Connect Timeout:</span>
-              <span class="info-value">{{ task.restTaskConfig.connectTimeoutSeconds }} seconds</span>
-            </div>
-            <div class="info-row" *ngIf="task.restTaskConfig.readTimeoutSeconds">
-              <span class="info-label">Read Timeout:</span>
-              <span class="info-value">{{ task.restTaskConfig.readTimeoutSeconds }} seconds</span>
-            </div>
+            @if (task.restTaskConfig.headers) {
+              <div class="detail-row">
+                <span class="label">Headers:</span>
+                <pre>{{ task.restTaskConfig.headers }}</pre>
+              </div>
+            }
+            @if (task.restTaskConfig.body) {
+              <div class="detail-row">
+                <span class="label">Body:</span>
+                <pre>{{ task.restTaskConfig.body }}</pre>
+              </div>
+            }
           </div>
-        </mat-expansion-panel>
+        }
 
         <!-- SOAP Task Config -->
-        <mat-expansion-panel *ngIf="task.soapTaskConfig">
-          <mat-expansion-panel-header>
-            <mat-panel-title>SOAP Task Configuration</mat-panel-title>
-          </mat-expansion-panel-header>
-          <div class="task-config">
-            <div class="info-row">
-              <span class="info-label">Endpoint URL:</span>
-              <span class="info-value">{{ task.soapTaskConfig.endpointUrl }}</span>
+        @if (task.taskType === 'SOAP_CALL' && task.soapTaskConfig) {
+          <div class="detail-section">
+            <h3>Configuração SOAP</h3>
+            <div class="detail-row">
+              <span class="label">URL do Endpoint:</span>
+              <span>{{ task.soapTaskConfig.endpointUrl }}</span>
             </div>
-            <div class="info-row" *ngIf="task.soapTaskConfig.soapAction">
-              <span class="info-label">SOAP Action:</span>
-              <span class="info-value">{{ task.soapTaskConfig.soapAction }}</span>
+            @if (task.soapTaskConfig.soapAction) {
+              <div class="detail-row">
+                <span class="label">SOAP Action:</span>
+                <span>{{ task.soapTaskConfig.soapAction }}</span>
+              </div>
+            }
+            <div class="detail-row">
+              <span class="label">Tipo de Autenticação:</span>
+              <span>{{ task.soapTaskConfig.authType }}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Auth Type:</span>
-              <span class="info-value">{{ task.soapTaskConfig.authType }}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Request XML:</span>
-              <pre class="info-value code-block">{{ task.soapTaskConfig.requestXml }}</pre>
+            <div class="detail-row">
+              <span class="label">XML da Requisição:</span>
+              <pre>{{ task.soapTaskConfig.requestXml }}</pre>
             </div>
           </div>
-        </mat-expansion-panel>
+        }
 
         <!-- Low Platform Batch Config -->
-        <mat-expansion-panel *ngIf="task.lowPlatformBatchConfig">
-          <mat-expansion-panel-header>
-            <mat-panel-title>Low Platform Batch Configuration</mat-panel-title>
-          </mat-expansion-panel-header>
-          <div class="task-config">
-            <div class="info-row">
-              <span class="info-label">Command:</span>
-              <span class="info-value">{{ task.lowPlatformBatchConfig.command }}</span>
+        @if (task.taskType === 'LOW_PLATFORM_BATCH' && task.lowPlatformBatchConfig) {
+          <div class="detail-section">
+            <h3>Configuração de Batch (Baixa Plataforma)</h3>
+            <div class="detail-row">
+              <span class="label">Comando:</span>
+              <span>{{ task.lowPlatformBatchConfig.command }}</span>
             </div>
-            <div class="info-row" *ngIf="task.lowPlatformBatchConfig.workingDirectory">
-              <span class="info-label">Working Directory:</span>
-              <span class="info-value">{{ task.lowPlatformBatchConfig.workingDirectory }}</span>
-            </div>
-            <div class="info-row" *ngIf="task.lowPlatformBatchConfig.environmentVariables">
-              <span class="info-label">Environment Variables:</span>
-              <pre class="info-value code-block">{{ task.lowPlatformBatchConfig.environmentVariables }}</pre>
-            </div>
-            <div class="info-row" *ngIf="task.lowPlatformBatchConfig.successExitCodes">
-              <span class="info-label">Success Exit Codes:</span>
-              <span class="info-value">{{ task.lowPlatformBatchConfig.successExitCodes }}</span>
-            </div>
-            <div class="info-row" *ngIf="task.lowPlatformBatchConfig.onSuccessCommand">
-              <span class="info-label">On Success Command:</span>
-              <span class="info-value">{{ task.lowPlatformBatchConfig.onSuccessCommand }}</span>
-            </div>
-            <div class="info-row" *ngIf="task.lowPlatformBatchConfig.onFailureCommand">
-              <span class="info-label">On Failure Command:</span>
-              <span class="info-value">{{ task.lowPlatformBatchConfig.onFailureCommand }}</span>
-            </div>
+            @if (task.lowPlatformBatchConfig.workingDirectory) {
+              <div class="detail-row">
+                <span class="label">Diretório de Trabalho:</span>
+                <span>{{ task.lowPlatformBatchConfig.workingDirectory }}</span>
+              </div>
+            }
+            @if (task.lowPlatformBatchConfig.environmentVariables) {
+              <div class="detail-row">
+                <span class="label">Variáveis de Ambiente:</span>
+                <pre>{{ task.lowPlatformBatchConfig.environmentVariables }}</pre>
+              </div>
+            }
           </div>
-        </mat-expansion-panel>
+        }
 
         <!-- High Platform Batch Config -->
-        <mat-expansion-panel *ngIf="task.highPlatformBatchConfig">
-          <mat-expansion-panel-header>
-            <mat-panel-title>High Platform Batch Configuration</mat-panel-title>
-          </mat-expansion-panel-header>
-          <div class="task-config">
-            <div class="info-row">
-              <span class="info-label">System Type:</span>
-              <span class="info-value">{{ task.highPlatformBatchConfig.systemType }}</span>
+        @if (task.taskType === 'HIGH_PLATFORM_BATCH' && task.highPlatformBatchConfig) {
+          <div class="detail-section">
+            <h3>Configuração de Batch (Alta Plataforma)</h3>
+            <div class="detail-row">
+              <span class="label">Tipo de Sistema:</span>
+              <span>{{ task.highPlatformBatchConfig.systemType }}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Job Name:</span>
-              <span class="info-value">{{ task.highPlatformBatchConfig.jobName }}</span>
+            <div class="detail-row">
+              <span class="label">Nome do Job:</span>
+              <span>{{ task.highPlatformBatchConfig.jobName }}</span>
             </div>
-            <div class="info-row" *ngIf="task.highPlatformBatchConfig.parameters">
-              <span class="info-label">Parameters:</span>
-              <pre class="info-value code-block">{{ task.highPlatformBatchConfig.parameters }}</pre>
-            </div>
-            <div class="info-row" *ngIf="task.highPlatformBatchConfig.connectionDetails">
-              <span class="info-label">Connection Details:</span>
-              <pre class="info-value code-block">{{ task.highPlatformBatchConfig.connectionDetails }}</pre>
-            </div>
+            @if (task.highPlatformBatchConfig.parameters) {
+              <div class="detail-row">
+                <span class="label">Parâmetros:</span>
+                <pre>{{ task.highPlatformBatchConfig.parameters }}</pre>
+              </div>
+            }
           </div>
-        </mat-expansion-panel>
+        }
 
-        <!-- Messaging Task Config -->
-        <mat-expansion-panel *ngIf="task.messagingTaskConfig">
-          <mat-expansion-panel-header>
-            <mat-panel-title>Messaging Task Configuration</mat-panel-title>
-          </mat-expansion-panel-header>
-          <div class="task-config">
-            <div class="info-row">
-              <span class="info-label">Broker Type:</span>
-              <span class="info-value">{{ task.messagingTaskConfig.brokerType }}</span>
+        <!-- Messaging Config -->
+        @if (task.taskType === 'MESSAGING' && task.messagingTaskConfig) {
+          <div class="detail-section">
+            <h3>Configuração de Mensageria</h3>
+            <div class="detail-row">
+              <span class="label">Tipo de Broker:</span>
+              <span>{{ task.messagingTaskConfig.brokerType }}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Destination:</span>
-              <span class="info-value">{{ task.messagingTaskConfig.destination }}</span>
+            <div class="detail-row">
+              <span class="label">Destino:</span>
+              <span>{{ task.messagingTaskConfig.destination }}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Auth Type:</span>
-              <span class="info-value">{{ task.messagingTaskConfig.authType }}</span>
+            <div class="detail-row">
+              <span class="label">Modo de Entrega:</span>
+              <span>{{ task.messagingTaskConfig.deliveryMode }}</span>
             </div>
-            <div class="info-row">
-              <span class="info-label">Delivery Mode:</span>
-              <span class="info-value">{{ task.messagingTaskConfig.deliveryMode }}</span>
-            </div>
-            <div class="info-row">
-              <span class="info-label">Message:</span>
-              <pre class="info-value code-block">{{ task.messagingTaskConfig.message }}</pre>
-            </div>
-            <div class="info-row" *ngIf="task.messagingTaskConfig.connectionProperties">
-              <span class="info-label">Connection Properties:</span>
-              <pre class="info-value code-block">{{ task.messagingTaskConfig.connectionProperties }}</pre>
+            <div class="detail-row">
+              <span class="label">Mensagem:</span>
+              <pre>{{ task.messagingTaskConfig.message }}</pre>
             </div>
           </div>
-        </mat-expansion-panel>
+        }
       </mat-card-content>
+      
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="editTask()">
+          <mat-icon>edit</mat-icon>
+          Editar
+        </button>
+        <button mat-raised-button color="warn" (click)="deleteTask()">
+          <mat-icon>delete</mat-icon>
+          Excluir
+        </button>
+        <button mat-raised-button (click)="viewExecutions()">
+          <mat-icon>history</mat-icon>
+          Ver Execuções
+        </button>
+        
+        @if (task.status === 'INACTIVE') {
+          <button mat-raised-button color="accent" (click)="activateTask()">
+            <mat-icon>play_circle</mat-icon>
+            Ativar
+          </button>
+        } @else if (task.status === 'ACTIVE') {
+          <button mat-raised-button (click)="deactivateTask()">
+            <mat-icon>pause_circle</mat-icon>
+            Desativar
+          </button>
+        }
+      </mat-card-actions>
     </mat-card>
-  </div>
+  } @else {
+    <div class="not-found">
+      <h2>Tarefa não encontrada</h2>
+      <button mat-raised-button color="primary" (click)="goBack()">Voltar para a lista</button>
+    </div>
+  }
 </div>

@@ -1,71 +1,84 @@
 .dashboard-container {
-  padding: 20px 0;
+  padding: 20px;
+  
+  h1 {
+    margin-bottom: 24px;
+    color: #333;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
 }
 
 .status-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
 }
 
 .status-card {
-  text-align: center;
+  transition: transform 0.2s;
+  
+  &:hover {
+    transform: translateY(-5px);
+  }
+  
+  .card-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 0;
+    
+    mat-icon {
+      font-size: 36px;
+      height: 36px;
+      width: 36px;
+      margin-right: 16px;
+    }
+    
+    .count {
+      font-size: 32px;
+      font-weight: 500;
+    }
+  }
+  
+  &.total mat-icon {
+    color: #607d8b;
+  }
+  
+  &.active mat-icon {
+    color: #4caf50;
+  }
+  
+  &.inactive mat-icon {
+    color: #9e9e9e;
+  }
+  
+  &.executing mat-icon {
+    color: #2196f3;
+  }
+  
+  &.completed mat-icon {
+    color: #8bc34a;
+  }
+  
+  &.failed mat-icon {
+    color: #f44336;
+  }
 }
 
-.status-count {
-  font-size: 48px;
-  font-weight: bold;
-  padding: 20px 0;
-}
-
-.recent-tasks-card {
+.action-buttons {
+  display: flex;
+  gap: 16px;
   margin-top: 20px;
-}
-
-.no-tasks-message {
-  padding: 20px;
-  text-align: center;
-  color: #757575;
-}
-
-/* Status colors */
-.status-active, .status-ACTIVE {
-  color: #4caf50;
-}
-
-.status-inactive, .status-INACTIVE {
-  color: #9e9e9e;
-}
-
-.status-running, .status-RUNNING {
-  color: #2196f3;
-}
-
-.status-completed, .status-COMPLETED {
-  color: #8bc34a;
-}
-
-.status-failed, .status-FAILED {
-  color: #f44336;
-}
-
-.active {
-  border-top: 4px solid #4caf50;
-}
-
-.inactive {
-  border-top: 4px solid #9e9e9e;
-}
-
-.running {
-  border-top: 4px solid #2196f3;
-}
-
-.completed {
-  border-top: 4px solid #8bc34a;
-}
-
-.failed {
-  border-top: 4px solid #f44336;
+  
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
 }

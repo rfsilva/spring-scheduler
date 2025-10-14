@@ -1,22 +1,34 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TaskService } from '../../core/services/task.service';
 import { ScheduledTask, TaskStatus } from '../../core/models/scheduled-task.model';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
   tasks: ScheduledTask[] = [];
   loading = true;
-  error = false;
-  
-  taskStatusCounts = {
+  statusCounts = {
+    total: 0,
     active: 0,
     inactive: 0,
-    running: 0,
+    executing: 0,
     completed: 0,
     failed: 0
   };
@@ -32,52 +44,25 @@ export class DashboardComponent implements OnInit {
 
   loadTasks(): void {
     this.loading = true;
-    this.error = false;
-    
     this.taskService.getAllTasks().subscribe({
-      next: (tasks) => {
-        this.tasks = tasks;
+      next: (data) => {
+        this.tasks = data;
         this.calculateStatusCounts();
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error loading tasks', err);
-        this.error = true;
+      error: () => {
         this.loading = false;
       }
     });
   }
 
   calculateStatusCounts(): void {
-    // Reset counts
-    this.taskStatusCounts = {
-      active: 0,
-      inactive: 0,
-      running: 0,
-      completed: 0,
-      failed: 0
-    };
-    
-    // Count tasks by status
-    this.tasks.forEach(task => {
-      switch (task.status) {
-        case TaskStatus.ACTIVE:
-          this.taskStatusCounts.active++;
-          break;
-        case TaskStatus.INACTIVE:
-          this.taskStatusCounts.inactive++;
-          break;
-        case TaskStatus.RUNNING:
-          this.taskStatusCounts.running++;
-          break;
-        case TaskStatus.COMPLETED:
-          this.taskStatusCounts.completed++;
-          break;
-        case TaskStatus.FAILED:
-          this.taskStatusCounts.failed++;
-          break;
-      }
-    });
+    this.statusCounts.total = this.tasks.length;
+    this.statusCounts.active = this.tasks.filter(task => task.status === TaskStatus.ACTIVE).length;
+    this.statusCounts.inactive = this.tasks.filter(task => task.status === TaskStatus.INACTIVE).length;
+    this.statusCounts.executing = this.tasks.filter(task => task.status === TaskStatus.EXECUTING).length;
+    this.statusCounts.completed = this.tasks.filter(task => task.status === TaskStatus.COMPLETED).length;
+    this.statusCounts.failed = this.tasks.filter(task => task.status === TaskStatus.FAILED).length;
   }
 
   navigateToTasks(): void {

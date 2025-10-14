@@ -1,0 +1,33 @@
+.not-found-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px;
+  text-align: center;
+  
+  h1 {
+    font-size: 6rem;
+    margin: 0;
+    color: #3f51b5;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    margin: 16px 0;
+    color: #333;
+  }
+  
+  p {
+    font-size: 1.2rem;
+    margin-bottom: 24px;
+    color: #666;
+  }
+  
+  button {
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}

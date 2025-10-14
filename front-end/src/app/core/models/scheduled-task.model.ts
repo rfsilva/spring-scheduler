@@ -1,6 +1,7 @@
+// Enums
 export enum TaskType {
-  REST = 'REST',
-  SOAP = 'SOAP',
+  REST_CALL = 'REST_CALL',
+  SOAP_CALL = 'SOAP_CALL',
   LOW_PLATFORM_BATCH = 'LOW_PLATFORM_BATCH',
   HIGH_PLATFORM_BATCH = 'HIGH_PLATFORM_BATCH',
   MESSAGING = 'MESSAGING'
@@ -9,25 +10,9 @@ export enum TaskType {
 export enum TaskStatus {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
-  RUNNING = 'RUNNING',
+  EXECUTING = 'EXECUTING',
   COMPLETED = 'COMPLETED',
   FAILED = 'FAILED'
-}
-
-export interface ScheduledTask {
-  id?: number;
-  name: string;
-  description: string;
-  taskType: TaskType;
-  status: TaskStatus;
-  cronExpression: string;
-  maxRetries?: number;
-  retryDelaySeconds?: number;
-  restTaskConfig?: RestTaskConfig;
-  soapTaskConfig?: SoapTaskConfig;
-  lowPlatformBatchConfig?: LowPlatformBatchConfig;
-  highPlatformBatchConfig?: HighPlatformBatchConfig;
-  messagingTaskConfig?: MessagingTaskConfig;
 }
 
 export enum HttpMethod {
@@ -35,17 +20,43 @@ export enum HttpMethod {
   POST = 'POST',
   PUT = 'PUT',
   DELETE = 'DELETE',
-  PATCH = 'PATCH'
+  PATCH = 'PATCH',
+  HEAD = 'HEAD',
+  OPTIONS = 'OPTIONS'
 }
 
 export enum RestAuthType {
   NONE = 'NONE',
   BASIC = 'BASIC',
   BEARER = 'BEARER',
-  API_KEY = 'API_KEY',
-  OAUTH2 = 'OAUTH2'
+  API_KEY = 'API_KEY'
 }
 
+export enum SoapAuthType {
+  NONE = 'NONE',
+  BASIC = 'BASIC',
+  WS_SECURITY = 'WS_SECURITY'
+}
+
+export enum BrokerType {
+  KAFKA = 'KAFKA',
+  RABBITMQ = 'RABBITMQ',
+  ACTIVEMQ = 'ACTIVEMQ',
+  IBM_MQ = 'IBM_MQ',
+  AWS_SQS = 'AWS_SQS'
+}
+
+export enum MessagingAuthType {
+  NONE = 'NONE',
+  BASIC = 'BASIC'
+}
+
+export enum DeliveryMode {
+  PERSISTENT = 'PERSISTENT',
+  NON_PERSISTENT = 'NON_PERSISTENT'
+}
+
+// Interfaces
 export interface RestTaskConfig {
   id?: number;
   url: string;
@@ -60,12 +71,6 @@ export interface RestTaskConfig {
   apiKeyValue?: string;
   connectTimeoutSeconds?: number;
   readTimeoutSeconds?: number;
-}
-
-export enum SoapAuthType {
-  NONE = 'NONE',
-  BASIC = 'BASIC',
-  WS_SECURITY = 'WS_SECURITY'
 }
 
 export interface SoapTaskConfig {
@@ -101,26 +106,6 @@ export interface HighPlatformBatchConfig {
   timeoutSeconds?: number;
 }
 
-export enum BrokerType {
-  ACTIVEMQ = 'ACTIVEMQ',
-  RABBITMQ = 'RABBITMQ',
-  KAFKA = 'KAFKA',
-  IBM_MQ = 'IBM_MQ',
-  AWS_SQS = 'AWS_SQS'
-}
-
-export enum MessagingAuthType {
-  NONE = 'NONE',
-  BASIC = 'BASIC',
-  SSL = 'SSL',
-  SASL = 'SASL'
-}
-
-export enum DeliveryMode {
-  PERSISTENT = 'PERSISTENT',
-  NON_PERSISTENT = 'NON_PERSISTENT'
-}
-
 export interface MessagingTaskConfig {
   id?: number;
   brokerType: BrokerType;
@@ -132,4 +117,20 @@ export interface MessagingTaskConfig {
   password?: string;
   deliveryMode: DeliveryMode;
   timeoutSeconds?: number;
+}
+
+export interface ScheduledTask {
+  id?: number;
+  name: string;
+  description: string;
+  taskType: TaskType;
+  status: TaskStatus;
+  cronExpression: string;
+  maxRetries?: number;
+  retryDelaySeconds?: number;
+  restTaskConfig?: RestTaskConfig;
+  soapTaskConfig?: SoapTaskConfig;
+  lowPlatformBatchConfig?: LowPlatformBatchConfig;
+  highPlatformBatchConfig?: HighPlatformBatchConfig;
+  messagingTaskConfig?: MessagingTaskConfig;
 }

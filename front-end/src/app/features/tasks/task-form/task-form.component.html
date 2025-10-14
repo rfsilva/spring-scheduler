@@ -1,448 +1,512 @@
 <div class="task-form-container">
-  <div class="page-header">
-    <h1>{{ isEditMode ? 'Edit Task' : 'Create Task' }}</h1>
+  <div class="header">
+    <button mat-icon-button (click)="cancel()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ isEditMode ? 'Editar Tarefa' : 'Nova Tarefa' }}</h1>
   </div>
 
-  <div *ngIf="loading" class="loading-spinner">
-    <mat-spinner diameter="40"></mat-spinner>
-  </div>
-
-  <form *ngIf="!loading" [formGroup]="taskForm" (ngSubmit)="onSubmit()">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Basic Information</mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Name</mat-label>
-            <input matInput formControlName="name" required>
-            <mat-error *ngIf="taskForm.get('name')?.hasError('required')">
-              Name is required
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Task Type</mat-label>
-            <mat-select formControlName="taskType" required>
-              <mat-option *ngFor="let type of taskTypes" [value]="type">
-                {{ type }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Description</mat-label>
-            <textarea matInput formControlName="description" rows="3" required></textarea>
-            <mat-error *ngIf="taskForm.get('description')?.hasError('required')">
-              Description is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Status</mat-label>
-            <mat-select formControlName="status" required>
-              <mat-option *ngFor="let status of taskStatuses" [value]="status">
-                {{ status }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Cron Expression</mat-label>
-            <input matInput formControlName="cronExpression" required>
-            <mat-hint>e.g., "0 0 * * * ?" for every hour</mat-hint>
-            <mat-error *ngIf="taskForm.get('cronExpression')?.hasError('required')">
-              Cron expression is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Max Retries</mat-label>
-            <input matInput type="number" formControlName="maxRetries">
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Retry Delay (seconds)</mat-label>
-            <input matInput type="number" formControlName="retryDelaySeconds">
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- REST Task Configuration -->
-    <mat-card *ngIf="taskForm.get('taskType')?.value === 'REST'" class="config-card">
-      <mat-card-header>
-        <mat-card-title>REST Task Configuration</mat-card-title>
-      </mat-card-header>
-      <mat-card-content formGroupName="restTaskConfig">
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>URL</mat-label>
-            <input matInput formControlName="url" required>
-            <mat-error *ngIf="taskForm.get('restTaskConfig.url')?.hasError('required')">
-              URL is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>HTTP Method</mat-label>
-            <mat-select formControlName="method" required>
-              <mat-option *ngFor="let method of httpMethods" [value]="method">
-                {{ method }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Authentication Type</mat-label>
-            <mat-select formControlName="authType" required>
-              <mat-option *ngFor="let authType of restAuthTypes" [value]="authType">
-                {{ authType }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row" *ngIf="taskForm.get('restTaskConfig.authType')?.value === 'BASIC'">
-          <mat-form-field class="form-field">
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username">
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row" *ngIf="taskForm.get('restTaskConfig.authType')?.value === 'BEARER'">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Bearer Token</mat-label>
-            <input matInput formControlName="token">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row" *ngIf="taskForm.get('restTaskConfig.authType')?.value === 'API_KEY'">
-          <mat-form-field class="form-field">
-            <mat-label>API Key Name</mat-label>
-            <input matInput formControlName="apiKeyName">
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>API Key Value</mat-label>
-            <input matInput formControlName="apiKeyValue">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Connect Timeout (seconds)</mat-label>
-            <input matInput type="number" formControlName="connectTimeoutSeconds">
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Read Timeout (seconds)</mat-label>
-            <input matInput type="number" formControlName="readTimeoutSeconds">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Headers (JSON format)</mat-label>
-            <textarea matInput formControlName="headers" rows="3"></textarea>
-            <mat-hint>e.g., {{ '{' }}"Content-Type": "application/json"{{ '}' }}</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Request Body</mat-label>
-            <textarea matInput formControlName="body" rows="5"></textarea>
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- SOAP Task Configuration -->
-    <mat-card *ngIf="taskForm.get('taskType')?.value === 'SOAP'" class="config-card">
-      <mat-card-header>
-        <mat-card-title>SOAP Task Configuration</mat-card-title>
-      </mat-card-header>
-      <mat-card-content formGroupName="soapTaskConfig">
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Endpoint URL</mat-label>
-            <input matInput formControlName="endpointUrl" required>
-            <mat-error *ngIf="taskForm.get('soapTaskConfig.endpointUrl')?.hasError('required')">
-              Endpoint URL is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>SOAP Action</mat-label>
-            <input matInput formControlName="soapAction">
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Authentication Type</mat-label>
-            <mat-select formControlName="authType" required>
-              <mat-option *ngFor="let authType of soapAuthTypes" [value]="authType">
-                {{ authType }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row" *ngIf="taskForm.get('soapTaskConfig.authType')?.value !== 'NONE'">
-          <mat-form-field class="form-field">
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username">
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Connect Timeout (seconds)</mat-label>
-            <input matInput type="number" formControlName="connectTimeoutSeconds">
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Read Timeout (seconds)</mat-label>
-            <input matInput type="number" formControlName="readTimeoutSeconds">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Request XML</mat-label>
-            <textarea matInput formControlName="requestXml" rows="10" required></textarea>
-            <mat-error *ngIf="taskForm.get('soapTaskConfig.requestXml')?.hasError('required')">
-              Request XML is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Low Platform Batch Configuration -->
-    <mat-card *ngIf="taskForm.get('taskType')?.value === 'LOW_PLATFORM_BATCH'" class="config-card">
-      <mat-card-header>
-        <mat-card-title>Low Platform Batch Configuration</mat-card-title>
-      </mat-card-header>
-      <mat-card-content formGroupName="lowPlatformBatchConfig">
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Command</mat-label>
-            <input matInput formControlName="command" required>
-            <mat-error *ngIf="taskForm.get('lowPlatformBatchConfig.command')?.hasError('required')">
-              Command is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Working Directory</mat-label>
-            <input matInput formControlName="workingDirectory">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Success Exit Codes</mat-label>
-            <input matInput formControlName="successExitCodes">
-            <mat-hint>Comma-separated list (e.g., "0,1,2")</mat-hint>
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Timeout (seconds)</mat-label>
-            <input matInput type="number" formControlName="timeoutSeconds">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Environment Variables</mat-label>
-            <textarea matInput formControlName="environmentVariables" rows="3"></textarea>
-            <mat-hint>Format: KEY1=value1,KEY2=value2</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>On Success Command</mat-label>
-            <input matInput formControlName="onSuccessCommand">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>On Failure Command</mat-label>
-            <input matInput formControlName="onFailureCommand">
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- High Platform Batch Configuration -->
-    <mat-card *ngIf="taskForm.get('taskType')?.value === 'HIGH_PLATFORM_BATCH'" class="config-card">
-      <mat-card-header>
-        <mat-card-title>High Platform Batch Configuration</mat-card-title>
-      </mat-card-header>
-      <mat-card-content formGroupName="highPlatformBatchConfig">
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>System Type</mat-label>
-            <input matInput formControlName="systemType" required>
-            <mat-error *ngIf="taskForm.get('highPlatformBatchConfig.systemType')?.hasError('required')">
-              System Type is required
-            </mat-error>
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Job Name</mat-label>
-            <input matInput formControlName="jobName" required>
-            <mat-error *ngIf="taskForm.get('highPlatformBatchConfig.jobName')?.hasError('required')">
-              Job Name is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Parameters</mat-label>
-            <textarea matInput formControlName="parameters" rows="3"></textarea>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Credentials</mat-label>
-            <textarea matInput formControlName="credentials" rows="3"></textarea>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Connection Details</mat-label>
-            <textarea matInput formControlName="connectionDetails" rows="3"></textarea>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Timeout (seconds)</mat-label>
-            <input matInput type="number" formControlName="timeoutSeconds">
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Messaging Task Configuration -->
-    <mat-card *ngIf="taskForm.get('taskType')?.value === 'MESSAGING'" class="config-card">
-      <mat-card-header>
-        <mat-card-title>Messaging Task Configuration</mat-card-title>
-      </mat-card-header>
-      <mat-card-content formGroupName="messagingTaskConfig">
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Broker Type</mat-label>
-            <mat-select formControlName="brokerType" required>
-              <mat-option *ngFor="let brokerType of brokerTypes" [value]="brokerType">
-                {{ brokerType }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Destination</mat-label>
-            <input matInput formControlName="destination" required>
-            <mat-error *ngIf="taskForm.get('messagingTaskConfig.destination')?.hasError('required')">
-              Destination is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Authentication Type</mat-label>
-            <mat-select formControlName="authType" required>
-              <mat-option *ngFor="let authType of messagingAuthTypes" [value]="authType">
-                {{ authType }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Delivery Mode</mat-label>
-            <mat-select formControlName="deliveryMode" required>
-              <mat-option *ngFor="let mode of deliveryModes" [value]="mode">
-                {{ mode }}
-              </mat-option>
-            </mat-select>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row" *ngIf="taskForm.get('messagingTaskConfig.authType')?.value !== 'NONE'">
-          <mat-form-field class="form-field">
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username">
-          </mat-form-field>
-
-          <mat-form-field class="form-field">
-            <mat-label>Password</mat-label>
-            <input matInput type="password" formControlName="password">
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Connection Properties</mat-label>
-            <textarea matInput formControlName="connectionProperties" rows="3"></textarea>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field full-width">
-            <mat-label>Message</mat-label>
-            <textarea matInput formControlName="message" rows="5" required></textarea>
-            <mat-error *ngIf="taskForm.get('messagingTaskConfig.message')?.hasError('required')">
-              Message is required
-            </mat-error>
-          </mat-form-field>
-        </div>
-
-        <div class="form-row">
-          <mat-form-field class="form-field">
-            <mat-label>Timeout (seconds)</mat-label>
-            <input matInput type="number" formControlName="timeoutSeconds">
-          </mat-form-field>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <div class="form-actions">
-      <button mat-button type="button" (click)="cancel()">Cancel</button>
-      <button mat-raised-button color="primary" type="submit" [disabled]="submitting">
-        <mat-spinner *ngIf="submitting" diameter="20" class="spinner-button"></mat-spinner>
-        <span *ngIf="!submitting">{{ isEditMode ? 'Update' : 'Create' }}</span>
-      </button>
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
     </div>
-  </form>
+  } @else {
+    <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+      <mat-card class="form-card">
+        <mat-card-header>
+          <mat-card-title>Informações Básicas</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nome</mat-label>
+              <input matInput formControlName="name" placeholder="Nome da tarefa">
+              @if (taskForm.get('name')?.invalid && taskForm.get('name')?.touched) {
+                <mat-error>Nome é obrigatório</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Descrição</mat-label>
+              <textarea matInput formControlName="description" placeholder="Descrição da tarefa" rows="3"></textarea>
+              @if (taskForm.get('description')?.invalid && taskForm.get('description')?.touched) {
+                <mat-error>Descrição é obrigatória</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Tarefa</mat-label>
+              <mat-select formControlName="taskType">
+                @for (type of taskTypes; track type) {
+                  <mat-option [value]="type">{{ type }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="status">
+                @for (status of taskStatuses; track status) {
+                  <mat-option [value]="status">{{ status }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Expressão Cron</mat-label>
+              <input matInput formControlName="cronExpression" placeholder="0 0 * * * ?">
+              <mat-hint>Formato: segundo minuto hora dia-do-mês mês dia-da-semana</mat-hint>
+              @if (taskForm.get('cronExpression')?.invalid && taskForm.get('cronExpression')?.touched) {
+                <mat-error>Expressão Cron é obrigatória</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Máximo de Tentativas</mat-label>
+              <input matInput type="number" formControlName="maxRetries" min="0">
+              <mat-hint>0 = sem tentativas adicionais</mat-hint>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Atraso entre Tentativas (segundos)</mat-label>
+              <input matInput type="number" formControlName="retryDelaySeconds" min="0">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <!-- REST Task Config -->
+      <mat-card class="form-card" formGroupName="restTaskConfig" *ngIf="taskForm.get('taskType')?.value === TaskType.REST_CALL">
+        <mat-card-header>
+          <mat-card-title>Configuração REST</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>URL</mat-label>
+              <input matInput formControlName="url" placeholder="https://api.example.com/endpoint">
+              @if (taskForm.get('restTaskConfig.url')?.invalid && taskForm.get('restTaskConfig.url')?.touched) {
+                <mat-error>URL é obrigatória</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Método HTTP</mat-label>
+              <mat-select formControlName="method">
+                @for (method of httpMethods; track method) {
+                  <mat-option [value]="method">{{ method }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Autenticação</mat-label>
+              <mat-select formControlName="authType">
+                @for (authType of restAuthTypes; track authType) {
+                  <mat-option [value]="authType">{{ authType }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <!-- Auth fields based on selected auth type -->
+          <ng-container [ngSwitch]="taskForm.get('restTaskConfig.authType')?.value">
+            <!-- Basic Auth -->
+            <ng-container *ngSwitchCase="RestAuthType.BASIC">
+              <div class="form-row two-columns">
+                <mat-form-field appearance="outline">
+                  <mat-label>Usuário</mat-label>
+                  <input matInput formControlName="username">
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline">
+                  <mat-label>Senha</mat-label>
+                  <input matInput type="password" formControlName="password">
+                </mat-form-field>
+              </div>
+            </ng-container>
+            
+            <!-- Bearer Token -->
+            <ng-container *ngSwitchCase="RestAuthType.BEARER">
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Token</mat-label>
+                  <input matInput formControlName="token">
+                </mat-form-field>
+              </div>
+            </ng-container>
+            
+            <!-- API Key -->
+            <ng-container *ngSwitchCase="RestAuthType.API_KEY">
+              <div class="form-row two-columns">
+                <mat-form-field appearance="outline">
+                  <mat-label>Nome da API Key</mat-label>
+                  <input matInput formControlName="apiKeyName">
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline">
+                  <mat-label>Valor da API Key</mat-label>
+                  <input matInput formControlName="apiKeyValue">
+                </mat-form-field>
+              </div>
+            </ng-container>
+          </ng-container>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Headers</mat-label>
+              <textarea matInput formControlName="headers" placeholder="Content-Type: application/json&#10;Accept: application/json" rows="3"></textarea>
+              <mat-hint>Um header por linha no formato "nome: valor"</mat-hint>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Body</mat-label>
+              <textarea matInput formControlName="body" placeholder='{"key": "value"}' rows="5"></textarea>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Timeout de Conexão (segundos)</mat-label>
+              <input matInput type="number" formControlName="connectTimeoutSeconds" min="1">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Timeout de Leitura (segundos)</mat-label>
+              <input matInput type="number" formControlName="readTimeoutSeconds" min="1">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <!-- SOAP Task Config -->
+      <mat-card class="form-card" formGroupName="soapTaskConfig" *ngIf="taskForm.get('taskType')?.value === TaskType.SOAP_CALL">
+        <mat-card-header>
+          <mat-card-title>Configuração SOAP</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>URL do Endpoint</mat-label>
+              <input matInput formControlName="endpointUrl" placeholder="http://example.com/soap-service">
+              @if (taskForm.get('soapTaskConfig.endpointUrl')?.invalid && taskForm.get('soapTaskConfig.endpointUrl')?.touched) {
+                <mat-error>URL do Endpoint é obrigatória</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>SOAP Action</mat-label>
+              <input matInput formControlName="soapAction" placeholder="http://example.com/GetData">
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Autenticação</mat-label>
+              <mat-select formControlName="authType">
+                @for (authType of soapAuthTypes; track authType) {
+                  <mat-option [value]="authType">{{ authType }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <!-- Auth fields based on selected auth type -->
+          <ng-container [ngSwitch]="taskForm.get('soapTaskConfig.authType')?.value">
+            <!-- Basic Auth -->
+            <ng-container *ngSwitchCase="SoapAuthType.BASIC">
+              <div class="form-row two-columns">
+                <mat-form-field appearance="outline">
+                  <mat-label>Usuário</mat-label>
+                  <input matInput formControlName="username">
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline">
+                  <mat-label>Senha</mat-label>
+                  <input matInput type="password" formControlName="password">
+                </mat-form-field>
+              </div>
+            </ng-container>
+            
+            <!-- WS Security -->
+            <ng-container *ngSwitchCase="SoapAuthType.WS_SECURITY">
+              <div class="form-row two-columns">
+                <mat-form-field appearance="outline">
+                  <mat-label>Usuário</mat-label>
+                  <input matInput formControlName="username">
+                </mat-form-field>
+                
+                <mat-form-field appearance="outline">
+                  <mat-label>Senha</mat-label>
+                  <input matInput type="password" formControlName="password">
+                </mat-form-field>
+              </div>
+            </ng-container>
+          </ng-container>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>XML da Requisição</mat-label>
+              <textarea matInput formControlName="requestXml" rows="8" placeholder='<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <GetData/>
+  </soapenv:Body>
+</soapenv:Envelope>'></textarea>
+              @if (taskForm.get('soapTaskConfig.requestXml')?.invalid && taskForm.get('soapTaskConfig.requestXml')?.touched) {
+                <mat-error>XML da Requisição é obrigatório</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Timeout de Conexão (segundos)</mat-label>
+              <input matInput type="number" formControlName="connectTimeoutSeconds" min="1">
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Timeout de Leitura (segundos)</mat-label>
+              <input matInput type="number" formControlName="readTimeoutSeconds" min="1">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <!-- Low Platform Batch Config -->
+      <mat-card class="form-card" formGroupName="lowPlatformBatchConfig" *ngIf="taskForm.get('taskType')?.value === TaskType.LOW_PLATFORM_BATCH">
+        <mat-card-header>
+          <mat-card-title>Configuração de Batch (Baixa Plataforma)</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Comando</mat-label>
+              <input matInput formControlName="command" placeholder="python script.py">
+              @if (taskForm.get('lowPlatformBatchConfig.command')?.invalid && taskForm.get('lowPlatformBatchConfig.command')?.touched) {
+                <mat-error>Comando é obrigatório</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Diretório de Trabalho</mat-label>
+              <input matInput formControlName="workingDirectory" placeholder="/path/to/directory">
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Variáveis de Ambiente</mat-label>
+              <textarea matInput formControlName="environmentVariables" placeholder="ENV_VAR1=value1&#10;ENV_VAR2=value2" rows="3"></textarea>
+              <mat-hint>Uma variável por linha no formato "NOME=valor"</mat-hint>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Códigos de Saída de Sucesso</mat-label>
+              <input matInput formControlName="successExitCodes" placeholder="0,1,2">
+              <mat-hint>Códigos separados por vírgula (padrão: 0)</mat-hint>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Comando em Caso de Sucesso</mat-label>
+              <input matInput formControlName="onSuccessCommand" placeholder="echo 'Success'">
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Comando em Caso de Falha</mat-label>
+              <input matInput formControlName="onFailureCommand" placeholder="echo 'Failed'">
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Timeout (segundos)</mat-label>
+              <input matInput type="number" formControlName="timeoutSeconds" min="1">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <!-- High Platform Batch Config -->
+      <mat-card class="form-card" formGroupName="highPlatformBatchConfig" *ngIf="taskForm.get('taskType')?.value === TaskType.HIGH_PLATFORM_BATCH">
+        <mat-card-header>
+          <mat-card-title>Configuração de Batch (Alta Plataforma)</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Sistema</mat-label>
+              <input matInput formControlName="systemType" placeholder="JES, CICS, API, MQ">
+              @if (taskForm.get('highPlatformBatchConfig.systemType')?.invalid && taskForm.get('highPlatformBatchConfig.systemType')?.touched) {
+                <mat-error>Tipo de Sistema é obrigatório</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Nome do Job</mat-label>
+              <input matInput formControlName="jobName" placeholder="BATCH001">
+              @if (taskForm.get('highPlatformBatchConfig.jobName')?.invalid && taskForm.get('highPlatformBatchConfig.jobName')?.touched) {
+                <mat-error>Nome do Job é obrigatório</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Parâmetros</mat-label>
+              <textarea matInput formControlName="parameters" placeholder="PARAM1=VALUE1&#10;PARAM2=VALUE2" rows="3"></textarea>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Credenciais</mat-label>
+              <textarea matInput formControlName="credentials" placeholder="username=user&#10;password=pass" rows="2"></textarea>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Detalhes de Conexão</mat-label>
+              <textarea matInput formControlName="connectionDetails" placeholder="host=mainframe.example.com&#10;port=1234" rows="3"></textarea>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Timeout (segundos)</mat-label>
+              <input matInput type="number" formControlName="timeoutSeconds" min="1">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <!-- Messaging Task Config -->
+      <mat-card class="form-card" formGroupName="messagingTaskConfig" *ngIf="taskForm.get('taskType')?.value === TaskType.MESSAGING">
+        <mat-card-header>
+          <mat-card-title>Configuração de Mensageria</mat-card-title>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Broker</mat-label>
+              <mat-select formControlName="brokerType">
+                @for (brokerType of brokerTypes; track brokerType) {
+                  <mat-option [value]="brokerType">{{ brokerType }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Destino</mat-label>
+              <input matInput formControlName="destination" placeholder="queue-name or topic-name">
+              @if (taskForm.get('messagingTaskConfig.destination')?.invalid && taskForm.get('messagingTaskConfig.destination')?.touched) {
+                <mat-error>Destino é obrigatório</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Tipo de Autenticação</mat-label>
+              <mat-select formControlName="authType">
+                @for (authType of messagingAuthTypes; track authType) {
+                  <mat-option [value]="authType">{{ authType }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            
+            <mat-form-field appearance="outline">
+              <mat-label>Modo de Entrega</mat-label>
+              <mat-select formControlName="deliveryMode">
+                @for (mode of deliveryModes; track mode) {
+                  <mat-option [value]="mode">{{ mode }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          
+          <!-- Auth fields if BASIC auth is selected -->
+          @if (taskForm.get('messagingTaskConfig.authType')?.value === MessagingAuthType.BASIC) {
+            <div class="form-row two-columns">
+              <mat-form-field appearance="outline">
+                <mat-label>Usuário</mat-label>
+                <input matInput formControlName="username">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Senha</mat-label>
+                <input matInput type="password" formControlName="password">
+              </mat-form-field>
+            </div>
+          }
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Propriedades de Conexão</mat-label>
+              <textarea matInput formControlName="connectionProperties" placeholder="bootstrap.servers=localhost:9092&#10;group.id=task-scheduler" rows="3"></textarea>
+              <mat-hint>Uma propriedade por linha no formato "chave=valor"</mat-hint>
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Mensagem</mat-label>
+              <textarea matInput formControlName="message" placeholder='{"key": "value"}' rows="5"></textarea>
+              @if (taskForm.get('messagingTaskConfig.message')?.invalid && taskForm.get('messagingTaskConfig.message')?.touched) {
+                <mat-error>Mensagem é obrigatória</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Timeout (segundos)</mat-label>
+              <input matInput type="number" formControlName="timeoutSeconds" min="1">
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+      
+      <div class="form-actions">
+        <button mat-button type="button" (click)="cancel()">Cancelar</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="submitting">
+          <mat-icon>save</mat-icon>
+          {{ isEditMode ? 'Atualizar' : 'Criar' }}
+        </button>
+      </div>
+    </form>
+  }
 </div>

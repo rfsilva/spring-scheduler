@@ -1,7 +1,19 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TaskService } from '../../../core/services/task.service';
 import { 
   ScheduledTask, 
@@ -17,6 +29,24 @@ import {
 
 @Component({
   selector: 'app-task-form',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    ReactiveFormsModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatDividerModule,
+    MatExpansionModule,
+    MatSlideToggleModule,
+    MatTooltipModule
+  ],
   templateUrl: './task-form.component.html',
   styleUrls: ['./task-form.component.scss']
 })
@@ -28,6 +58,16 @@ export class TaskFormComponent implements OnInit {
   submitting = false;
   
   // Enums for select options
+  TaskType = TaskType;
+  TaskStatus = TaskStatus;
+  HttpMethod = HttpMethod;
+  RestAuthType = RestAuthType;
+  SoapAuthType = SoapAuthType;
+  BrokerType = BrokerType;
+  MessagingAuthType = MessagingAuthType;
+  DeliveryMode = DeliveryMode;
+  
+  // Convert enums to arrays for template
   taskTypes = Object.values(TaskType);
   taskStatuses = Object.values(TaskStatus);
   httpMethods = Object.values(HttpMethod);
@@ -51,13 +91,13 @@ export class TaskFormComponent implements OnInit {
     this.route.paramMap.subscribe(params => {
       const id = params.get('id');
       if (id) {
-        this.taskId = +id;
         this.isEditMode = true;
+        this.taskId = +id;
         this.loadTask();
       }
     });
     
-    // Listen for task type changes to show/hide specific config sections
+    // Listen for task type changes to show/hide relevant config sections
     this.taskForm.get('taskType')?.valueChanges.subscribe(taskType => {
       this.updateConfigFormVisibility(taskType);
     });
@@ -67,11 +107,11 @@ export class TaskFormComponent implements OnInit {
     this.taskForm = this.fb.group({
       name: ['', [Validators.required]],
       description: ['', [Validators.required]],
-      taskType: [TaskType.REST, [Validators.required]],
+      taskType: [TaskType.REST_CALL, [Validators.required]],
       status: [TaskStatus.INACTIVE, [Validators.required]],
       cronExpression: ['0 0 * * * ?', [Validators.required]],
-      maxRetries: [3],
-      retryDelaySeconds: [60],
+      maxRetries: [0],
+      retryDelaySeconds: [0],
       
       // REST Task Config
       restTaskConfig: this.fb.group({
@@ -124,7 +164,7 @@ export class TaskFormComponent implements OnInit {
       
       // Messaging Task Config
       messagingTaskConfig: this.fb.group({
-        brokerType: [BrokerType.ACTIVEMQ, [Validators.required]],
+        brokerType: [BrokerType.KAFKA, [Validators.required]],
         destination: ['', [Validators.required]],
         message: ['', [Validators.required]],
         connectionProperties: [''],
@@ -136,58 +176,26 @@ export class TaskFormComponent implements OnInit {
       })
     });
     
-    // Initialize with the default task type
-    this.updateConfigFormVisibility(TaskType.REST);
-  }
-
-  updateConfigFormVisibility(taskType: TaskType): void {
-    // Disable all config forms first
-    this.taskForm.get('restTaskConfig')?.disable();
-    this.taskForm.get('soapTaskConfig')?.disable();
-    this.taskForm.get('lowPlatformBatchConfig')?.disable();
-    this.taskForm.get('highPlatformBatchConfig')?.disable();
-    this.taskForm.get('messagingTaskConfig')?.disable();
-    
-    // Enable only the relevant config form
-    switch (taskType) {
-      case TaskType.REST:
-        this.taskForm.get('restTaskConfig')?.enable();
-        break;
-      case TaskType.SOAP:
-        this.taskForm.get('soapTaskConfig')?.enable();
-        break;
-      case TaskType.LOW_PLATFORM_BATCH:
-        this.taskForm.get('lowPlatformBatchConfig')?.enable();
-        break;
-      case TaskType.HIGH_PLATFORM_BATCH:
-        this.taskForm.get('highPlatformBatchConfig')?.enable();
-        break;
-      case TaskType.MESSAGING:
-        this.taskForm.get('messagingTaskConfig')?.enable();
-        break;
-    }
+    // Initialize with REST_CALL selected
+    this.updateConfigFormVisibility(TaskType.REST_CALL);
   }
 
   loadTask(): void {
-    if (!this.taskId) return;
-    
     this.loading = true;
-    
-    this.taskService.getTaskById(this.taskId).subscribe({
+    this.taskService.getTaskById(this.taskId!).subscribe({
       next: (task) => {
         this.updateFormWithTask(task);
         this.loading = false;
       },
-      error: (err) => {
-        console.error('Error loading task', err);
-        this.snackBar.open('Failed to load task details', 'Close', { duration: 3000 });
+      error: () => {
         this.loading = false;
+        this.snackBar.open('Erro ao carregar a tarefa', 'Fechar', { duration: 3000 });
       }
     });
   }
 
   updateFormWithTask(task: ScheduledTask): void {
-    // Update main task fields
+    // Update main form fields
     this.taskForm.patchValue({
       name: task.name,
       description: task.description,
@@ -200,12 +208,12 @@ export class TaskFormComponent implements OnInit {
     
     // Update specific config based on task type
     switch (task.taskType) {
-      case TaskType.REST:
+      case TaskType.REST_CALL:
         if (task.restTaskConfig) {
           this.taskForm.get('restTaskConfig')?.patchValue(task.restTaskConfig);
         }
         break;
-      case TaskType.SOAP:
+      case TaskType.SOAP_CALL:
         if (task.soapTaskConfig) {
           this.taskForm.get('soapTaskConfig')?.patchValue(task.soapTaskConfig);
         }
@@ -231,43 +239,70 @@ export class TaskFormComponent implements OnInit {
     this.updateConfigFormVisibility(task.taskType);
   }
 
+  updateConfigFormVisibility(taskType: TaskType): void {
+    // Reset all config forms
+    const restConfig = this.taskForm.get('restTaskConfig');
+    const soapConfig = this.taskForm.get('soapTaskConfig');
+    const lowPlatformConfig = this.taskForm.get('lowPlatformBatchConfig');
+    const highPlatformConfig = this.taskForm.get('highPlatformBatchConfig');
+    const messagingConfig = this.taskForm.get('messagingTaskConfig');
+    
+    // Disable all config forms first
+    restConfig?.disable();
+    soapConfig?.disable();
+    lowPlatformConfig?.disable();
+    highPlatformConfig?.disable();
+    messagingConfig?.disable();
+    
+    // Enable only the relevant config form
+    switch (taskType) {
+      case TaskType.REST_CALL:
+        restConfig?.enable();
+        break;
+      case TaskType.SOAP_CALL:
+        soapConfig?.enable();
+        break;
+      case TaskType.LOW_PLATFORM_BATCH:
+        lowPlatformConfig?.enable();
+        break;
+      case TaskType.HIGH_PLATFORM_BATCH:
+        highPlatformConfig?.enable();
+        break;
+      case TaskType.MESSAGING:
+        messagingConfig?.enable();
+        break;
+    }
+  }
+
   onSubmit(): void {
     if (this.taskForm.invalid) {
       this.markFormGroupTouched(this.taskForm);
-      this.snackBar.open('Please fix the errors in the form', 'Close', { duration: 3000 });
+      this.snackBar.open('Por favor, corrija os erros no formulário', 'Fechar', { duration: 3000 });
       return;
     }
     
     this.submitting = true;
-    
-    // Prepare task data
     const taskData = this.prepareTaskData();
     
-    if (this.isEditMode && this.taskId) {
-      // Update existing task
-      this.taskService.updateTask(this.taskId, taskData).subscribe({
-        next: (task) => {
-          this.snackBar.open('Task updated successfully', 'Close', { duration: 3000 });
-          this.router.navigate(['/tasks', task.id]);
+    if (this.isEditMode) {
+      this.taskService.updateTask(this.taskId!, taskData).subscribe({
+        next: () => {
           this.submitting = false;
+          this.snackBar.open('Tarefa atualizada com sucesso', 'Fechar', { duration: 3000 });
+          this.router.navigate(['/tasks', this.taskId]);
         },
-        error: (err) => {
-          console.error('Error updating task', err);
-          this.snackBar.open('Failed to update task', 'Close', { duration: 3000 });
+        error: () => {
           this.submitting = false;
         }
       });
     } else {
-      // Create new task
       this.taskService.createTask(taskData).subscribe({
-        next: (task) => {
-          this.snackBar.open('Task created successfully', 'Close', { duration: 3000 });
-          this.router.navigate(['/tasks', task.id]);
+        next: (createdTask) => {
           this.submitting = false;
+          this.snackBar.open('Tarefa criada com sucesso', 'Fechar', { duration: 3000 });
+          this.router.navigate(['/tasks', createdTask.id]);
         },
-        error: (err) => {
-          console.error('Error creating task', err);
-          this.snackBar.open('Failed to create task', 'Close', { duration: 3000 });
+        error: () => {
           this.submitting = false;
         }
       });
@@ -289,17 +324,17 @@ export class TaskFormComponent implements OnInit {
       retryDelaySeconds: formValue.retryDelaySeconds
     };
     
-    // Add task ID if in edit mode
+    // Add ID if in edit mode
     if (this.isEditMode && this.taskId) {
       task.id = this.taskId;
     }
     
     // Add specific config based on task type
     switch (taskType) {
-      case TaskType.REST:
+      case TaskType.REST_CALL:
         task.restTaskConfig = formValue.restTaskConfig;
         break;
-      case TaskType.SOAP:
+      case TaskType.SOAP_CALL:
         task.soapTaskConfig = formValue.soapTaskConfig;
         break;
       case TaskType.LOW_PLATFORM_BATCH:
