@@ -1,0 +1,446 @@
+{
+	"info": {
+		"_postman_id": "e5f7b8c9-d0a1-4b2e-8f3c-9d6e7f8a9b0c",
+		"name": "Task Scheduler API",
+		"description": "Collection for testing the Task Scheduler API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Tasks",
+			"item": [
+				{
+					"name": "Get All Tasks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks"
+							]
+						},
+						"description": "Get all scheduled tasks"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Task By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"1"
+							]
+						},
+						"description": "Get a specific task by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Create REST Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Daily API Health Check\",\n    \"description\": \"Check the health of our API every day at 8 AM\",\n    \"taskType\": \"REST_CALL\",\n    \"status\": \"INACTIVE\",\n    \"cronExpression\": \"0 0 8 * * ?\",\n    \"maxRetries\": 3,\n    \"retryDelaySeconds\": 60,\n    \"restTaskConfig\": {\n        \"url\": \"https://api.example.com/health\",\n        \"method\": \"GET\",\n        \"headers\": \"{\\\"Accept\\\": \\\"application/json\\\"}\",\n        \"timeout\": 30,\n        \"authType\": \"BEARER\",\n        \"tokenEndpoint\": \"https://auth.example.com/token\",\n        \"clientId\": \"my-client-id\",\n        \"clientSecret\": \"my-client-secret\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks"
+							]
+						},
+						"description": "Create a new REST task"
+					},
+					"response": []
+				},
+				{
+					"name": "Create SOAP Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Weekly SOAP Service Call\",\n    \"description\": \"Call the SOAP service every Monday at 7 AM\",\n    \"taskType\": \"SOAP_CALL\",\n    \"status\": \"INACTIVE\",\n    \"cronExpression\": \"0 0 7 ? * MON\",\n    \"maxRetries\": 2,\n    \"retryDelaySeconds\": 120,\n    \"soapTaskConfig\": {\n        \"wsdlUrl\": \"https://soap.example.com/service?wsdl\",\n        \"operation\": \"getCustomerData\",\n        \"namespace\": \"http://example.com/soap\",\n        \"soapAction\": \"http://example.com/soap/getCustomerData\",\n        \"requestXml\": \"<soapenv:Envelope xmlns:soapenv=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" xmlns:exam=\\\"http://example.com/soap\\\">\\n   <soapenv:Header/>\\n   <soapenv:Body>\\n      <exam:getCustomerDataRequest>\\n         <exam:customerId>12345</exam:customerId>\\n      </exam:getCustomerDataRequest>\\n   </soapenv:Body>\\n</soapenv:Envelope>\",\n        \"authType\": \"BASIC\",\n        \"timeout\": 60,\n        \"username\": \"soapuser\",\n        \"password\": \"soappass\",\n        \"customHeaders\": \"{\\\"SOAPAction\\\": \\\"http://example.com/soap/getCustomerData\\\"}\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks"
+							]
+						},
+						"description": "Create a new SOAP task"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Low Platform Batch Task",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Daily Log Cleanup\",\n    \"description\": \"Clean up log files every day at midnight\",\n    \"taskType\": \"LOW_PLATFORM_BATCH\",\n    \"status\": \"INACTIVE\",\n    \"cronExpression\": \"0 0 0 * * ?\",\n    \"maxRetries\": 1,\n    \"retryDelaySeconds\": 300,\n    \"lowPlatformBatchConfig\": {\n        \"jobName\": \"log-cleanup\",\n        \"command\": \"cleanup-logs.sh\",\n        \"parameters\": \"--days 7 --verbose\",\n        \"workingDirectory\": \"/opt/scripts\",\n        \"timeout\": 600,\n        \"runAsUser\": \"admin\",\n        \"onSuccess\": \"notify-success.sh\",\n        \"onFailure\": \"notify-failure.sh\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks"
+							]
+						},
+						"description": "Create a new Low Platform Batch task"
+					},
+					"response": []
+				},
+				{
+					"name": "Create High Platform Batch Task (MQ)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Weekly Mainframe MQ Job\",\n    \"description\": \"Submit a job to the mainframe via MQ every Sunday at 11 PM\",\n    \"taskType\": \"HIGH_PLATFORM_BATCH\",\n    \"status\": \"INACTIVE\",\n    \"cronExpression\": \"0 0 23 ? * SUN\",\n    \"maxRetries\": 2,\n    \"retryDelaySeconds\": 180,\n    \"highPlatformBatchConfig\": {\n        \"endpointType\": \"MQ\",\n        \"transactionId\": \"MQJOB001\",\n        \"payload\": \"JOB CARD DATA\\nEXEC PGM=WEEKLY\\nINPUT DD *\\nPARAM1=VALUE1\\nPARAM2=VALUE2\\n/*\",\n        \"credentials\": \"{\\\"username\\\": \\\"mquser\\\", \\\"password\\\": \\\"mqpass\\\"}\",\n        \"timeout\": 300,\n        \"channel\": \"SYSTEM.DEF.SVRCONN\",\n        \"queue\": \"JOB.SUBMIT.QUEUE\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks"
+							]
+						},
+						"description": "Create a new High Platform Batch task using MQ"
+					},
+					"response": []
+				},
+				{
+					"name": "Create High Platform Batch Task (API)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Monthly Mainframe API Job\",\n    \"description\": \"Submit a job to the mainframe via API on the 1st of each month\",\n    \"taskType\": \"HIGH_PLATFORM_BATCH\",\n    \"status\": \"INACTIVE\",\n    \"cronExpression\": \"0 0 1 1 * ?\",\n    \"maxRetries\": 3,\n    \"retryDelaySeconds\": 240,\n    \"highPlatformBatchConfig\": {\n        \"endpointType\": \"API\",\n        \"transactionId\": \"APIJOB002\",\n        \"payload\": \"{\\\"jobName\\\": \\\"MONTHLY\\\", \\\"parameters\\\": {\\\"MONTH\\\": \\\"CURRENT\\\", \\\"MODE\\\": \\\"FULL\\\"}}\",\n        \"credentials\": \"{\\\"username\\\": \\\"apiuser\\\", \\\"password\\\": \\\"apipass\\\"}\",\n        \"timeout\": 300,\n        \"host\": \"mainframe-api.example.com\",\n        \"port\": \"443\",\n        \"sslCertPath\": \"/etc/certs/mainframe-api.crt\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks"
+							]
+						},
+						"description": "Create a new High Platform Batch task using API"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Messaging Task (Kafka)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Hourly Kafka Message\",\n    \"description\": \"Send a message to Kafka topic every hour\",\n    \"taskType\": \"MESSAGING\",\n    \"status\": \"INACTIVE\",\n    \"cronExpression\": \"0 0 * * * ?\",\n    \"maxRetries\": 3,\n    \"retryDelaySeconds\": 60,\n    \"messagingTaskConfig\": {\n        \"brokerType\": \"KAFKA\",\n        \"destinationName\": \"hourly-updates\",\n        \"messagePayload\": \"{\\\"timestamp\\\": \\\"${now}\\\", \\\"type\\\": \\\"HOURLY_UPDATE\\\", \\\"data\\\": {\\\"source\\\": \\\"scheduler\\\"}}\",\n        \"connectionUrl\": \"kafka.example.com:9092\",\n        \"authType\": \"BASIC\",\n        \"headers\": \"{\\\"Content-Type\\\": \\\"application/json\\\"}\",\n        \"deliveryMode\": \"PERSISTENT\",\n        \"retryPolicy\": \"{\\\"maxRetries\\\": 3, \\\"retryInterval\\\": 5000}\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks"
+							]
+						},
+						"description": "Create a new Messaging task using Kafka"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Messaging Task (RabbitMQ)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Daily RabbitMQ Message\",\n    \"description\": \"Send a message to RabbitMQ queue every day at 6 AM\",\n    \"taskType\": \"MESSAGING\",\n    \"status\": \"INACTIVE\",\n    \"cronExpression\": \"0 0 6 * * ?\",\n    \"maxRetries\": 3,\n    \"retryDelaySeconds\": 60,\n    \"messagingTaskConfig\": {\n        \"brokerType\": \"RABBITMQ\",\n        \"destinationName\": \"daily-reports\",\n        \"messagePayload\": \"{\\\"timestamp\\\": \\\"${now}\\\", \\\"type\\\": \\\"DAILY_REPORT\\\", \\\"data\\\": {\\\"reportDate\\\": \\\"${yesterday}\\\"}}\",\n        \"connectionUrl\": \"amqp://rabbitmq.example.com:5672\",\n        \"authType\": \"BASIC\",\n        \"headers\": \"{\\\"Content-Type\\\": \\\"application/json\\\", \\\"priority\\\": \\\"high\\\"}\",\n        \"deliveryMode\": \"PERSISTENT\",\n        \"retryPolicy\": \"{\\\"maxRetries\\\": 5, \\\"retryInterval\\\": 10000}\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks"
+							]
+						},
+						"description": "Create a new Messaging task using RabbitMQ"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Task",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Task Name\",\n    \"description\": \"Updated task description\",\n    \"taskType\": \"REST_CALL\",\n    \"status\": \"INACTIVE\",\n    \"cronExpression\": \"0 0 12 * * ?\",\n    \"maxRetries\": 5,\n    \"retryDelaySeconds\": 120,\n    \"restTaskConfig\": {\n        \"url\": \"https://api.example.com/updated-endpoint\",\n        \"method\": \"GET\",\n        \"headers\": \"{\\\"Accept\\\": \\\"application/json\\\"}\",\n        \"timeout\": 60,\n        \"authType\": \"BEARER\",\n        \"tokenEndpoint\": \"https://auth.example.com/token\",\n        \"clientId\": \"updated-client-id\",\n        \"clientSecret\": \"updated-client-secret\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tasks/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"1"
+							]
+						},
+						"description": "Update an existing task"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Task",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"1"
+							]
+						},
+						"description": "Delete a task"
+					},
+					"response": []
+				},
+				{
+					"name": "Activate Task",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/1/activate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"1",
+								"activate"
+							]
+						},
+						"description": "Activate a task"
+					},
+					"response": []
+				},
+				{
+					"name": "Deactivate Task",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/1/deactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"1",
+								"deactivate"
+							]
+						},
+						"description": "Deactivate a task"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Task Executions",
+			"item": [
+				{
+					"name": "Get Task Execution History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/1/executions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"1",
+								"executions"
+							]
+						},
+						"description": "Get execution history for a specific task"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Task Execution History (Paged)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/1/executions/paged?page=0&size=10&sort=startTime,desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"1",
+								"executions",
+								"paged"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sort",
+									"value": "startTime,desc"
+								}
+							]
+						},
+						"description": "Get paginated execution history for a specific task"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Task Execution History (Date Range)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/tasks/1/executions/date-range?start=2023-01-01T00:00:00Z&end=2023-12-31T23:59:59Z",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"tasks",
+								"1",
+								"executions",
+								"date-range"
+							],
+							"query": [
+								{
+									"key": "start",
+									"value": "2023-01-01T00:00:00Z"
+								},
+								{
+									"key": "end",
+									"value": "2023-12-31T23:59:59Z"
+								}
+							]
+						},
+						"description": "Get execution history for a specific task within a date range"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		}
+	]
+}

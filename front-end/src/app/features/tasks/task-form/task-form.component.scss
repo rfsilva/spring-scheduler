@@ -1,0 +1,36 @@
+.task-form-container {
+  padding: 20px 0;
+}
+
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+.full-width {
+  flex-basis: 100%;
+}
+
+.config-card {
+  margin-top: 20px;
+}
+
+.form-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.spinner-button {
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+}
