@@ -103,6 +103,33 @@ VALUES
 </soapenv:Envelope>', 
 'NONE', 30, '', '', '{}');
 
+-- 8. Batch Low Platform - Iniciar Processamento
+INSERT INTO scheduled_tasks (id, created_at, updated_at, name, description, task_type, status, cron_expression, next_execution, last_execution, last_execution_status, last_execution_message, execution_count, max_retries, retry_delay_seconds, task_data)
+VALUES 
+(8, NOW(), NOW(), 'Iniciar Batch Low Platform', 'Inicia o processamento em lote na plataforma baixa', 'REST_CALL', 'ACTIVE', '0 0 1 * * ?', NOW() + INTERVAL '1 DAY', NOW() - INTERVAL '1 DAY', 'SUCCESS', 'Batch iniciado com sucesso', 30, 3, 60, '{"description": "Processamento em lote diário"}');
+
+INSERT INTO rest_task_configs (id, created_at, updated_at, scheduled_task_id, url, method, headers, body, timeout, auth_type, retry_policy, token_endpoint, client_id, client_secret, certificate_path)
+VALUES 
+(5, NOW(), NOW(), 8, 'http://batch-low-platform:8083/api/batch/start', 'POST', '{"Content-Type": "application/json"}', '{}', 60, 'NONE', '{"maxAttempts": 3, "backoffPolicy": "FIXED"}', NULL, NULL, NULL, NULL);
+
+-- 9. Batch Low Platform - Verificar Status
+INSERT INTO scheduled_tasks (id, created_at, updated_at, name, description, task_type, status, cron_expression, next_execution, last_execution, last_execution_status, last_execution_message, execution_count, max_retries, retry_delay_seconds, task_data)
+VALUES 
+(9, NOW(), NOW(), 'Verificar Status do Batch', 'Verifica o status do serviço de batch na plataforma baixa', 'REST_CALL', 'ACTIVE', '0 */30 * * * ?', NOW() + INTERVAL '30 MINUTE', NOW() - INTERVAL '30 MINUTE', 'SUCCESS', 'Status verificado com sucesso', 48, 3, 60, '{"description": "Monitoramento do serviço de batch"}');
+
+INSERT INTO rest_task_configs (id, created_at, updated_at, scheduled_task_id, url, method, headers, body, timeout, auth_type, retry_policy, token_endpoint, client_id, client_secret, certificate_path)
+VALUES 
+(6, NOW(), NOW(), 9, 'http://batch-low-platform:8083/api/batch/status', 'GET', '{"Content-Type": "application/json"}', NULL, 30, 'NONE', '{"maxAttempts": 3, "backoffPolicy": "FIXED"}', NULL, NULL, NULL, NULL);
+
+-- 10. Batch Low Platform - Verificar Saúde
+INSERT INTO scheduled_tasks (id, created_at, updated_at, name, description, task_type, status, cron_expression, next_execution, last_execution, last_execution_status, last_execution_message, execution_count, max_retries, retry_delay_seconds, task_data)
+VALUES 
+(10, NOW(), NOW(), 'Verificar Saúde do Batch', 'Verifica a saúde do serviço de batch na plataforma baixa', 'REST_CALL', 'ACTIVE', '0 */15 * * * ?', NOW() + INTERVAL '15 MINUTE', NOW() - INTERVAL '15 MINUTE', 'SUCCESS', 'Saúde verificada com sucesso', 96, 3, 60, '{"description": "Monitoramento de saúde do serviço de batch"}');
+
+INSERT INTO rest_task_configs (id, created_at, updated_at, scheduled_task_id, url, method, headers, body, timeout, auth_type, retry_policy, token_endpoint, client_id, client_secret, certificate_path)
+VALUES 
+(7, NOW(), NOW(), 10, 'http://batch-low-platform:8083/api/batch/health', 'GET', '{"Content-Type": "application/json"}', NULL, 30, 'NONE', '{"maxAttempts": 3, "backoffPolicy": "FIXED"}', NULL, NULL, NULL, NULL);
+
 -- Inserir execuções de tarefas para histórico
 
 -- Execuções para a tarefa de Consulta CEP
@@ -183,3 +210,18 @@ VALUES
 INSERT INTO task_executions (id, created_at, updated_at, scheduled_task_id, start_time, end_time, status, result, error_message, retry_count)
 VALUES 
 (18, NOW() - INTERVAL '1 DAY', NOW() - INTERVAL '1 DAY', 7, NOW() - INTERVAL '1 DAY', NOW() - INTERVAL '1 DAY', 'FAILED', NULL, 'Erro de conexão: Timeout ao conectar com o serviço', 2);
+
+-- Execuções para a tarefa de Iniciar Batch Low Platform
+INSERT INTO task_executions (id, created_at, updated_at, scheduled_task_id, start_time, end_time, status, result, error_message, retry_count)
+VALUES 
+(19, NOW() - INTERVAL '1 DAY', NOW() - INTERVAL '1 DAY', 8, NOW() - INTERVAL '1 DAY', NOW() - INTERVAL '1 DAY', 'SUCCESS', '{"status":"Job started successfully","timestamp":"2023-05-19T01:00:00.123"}', NULL, 0);
+
+-- Execuções para a tarefa de Verificar Status do Batch
+INSERT INTO task_executions (id, created_at, updated_at, scheduled_task_id, start_time, end_time, status, result, error_message, retry_count)
+VALUES 
+(20, NOW() - INTERVAL '30 MINUTE', NOW() - INTERVAL '30 MINUTE', 9, NOW() - INTERVAL '30 MINUTE', NOW() - INTERVAL '30 MINUTE', 'SUCCESS', '{"status":"UP","service":"Batch Low Platform","timestamp":"2023-05-19T12:30:00.123"}', NULL, 0);
+
+-- Execuções para a tarefa de Verificar Saúde do Batch
+INSERT INTO task_executions (id, created_at, updated_at, scheduled_task_id, start_time, end_time, status, result, error_message, retry_count)
+VALUES 
+(21, NOW() - INTERVAL '15 MINUTE', NOW() - INTERVAL '15 MINUTE', 10, NOW() - INTERVAL '15 MINUTE', NOW() - INTERVAL '15 MINUTE', 'SUCCESS', '{"status":"UP","service":"Batch Low Platform"}', NULL, 0);

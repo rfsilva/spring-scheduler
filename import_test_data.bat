@@ -14,6 +14,12 @@ if %ERRORLEVEL% == 0 (
     REM Executar o script SQL no banco de dados
     docker exec -it task-scheduler-db psql -U postgres -d taskscheduler -f /tmp/test_data.sql
     
+    REM Copiar o arquivo SQL de batch para o container
+    docker cp test_data_batch_low_platform.sql task-scheduler-db:/tmp/
+    
+    REM Executar o script SQL de batch no banco de dados
+    docker exec -it task-scheduler-db psql -U postgres -d taskscheduler -f /tmp/test_data_batch_low_platform.sql
+    
     echo Dados importados com sucesso para o container Docker!
 ) else (
     REM Tentar importar localmente
@@ -32,6 +38,9 @@ if %ERRORLEVEL% == 0 (
     set PGPASSWORD=%dbpassword%
     psql -U %dbuser% -d %dbname% -f test_data.sql
     
+    REM Executar o script SQL de batch
+    psql -U %dbuser% -d %dbname% -f test_data_batch_low_platform.sql
+    
     REM Limpar a senha da variável de ambiente
     set PGPASSWORD=
     
@@ -41,9 +50,12 @@ if %ERRORLEVEL% == 0 (
 echo.
 echo Resumo dos dados importados:
 echo - 7 tarefas agendadas (4 REST e 3 SOAP)
-echo - 18 execucoes de tarefas para historico
+echo - 3 tarefas agendadas para o batch-low-platform
+echo - 3 tarefas REST para interagir com o batch-low-platform
+echo - 24 execucoes de tarefas para historico
 echo - API REST nao segura usa banco de dados H2 em memoria com dados pre-carregados
 echo - API REST segura usa banco de dados H2 em memoria com dados pre-carregados
+echo - Batch Low Platform usa banco de dados H2 em memoria com dados pre-carregados
 echo.
 echo Para testar os endpoints, consulte o arquivo endpoint_testing_examples.md
 echo Para mais informacoes, consulte o arquivo test_data_README.md

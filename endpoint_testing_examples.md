@@ -361,6 +361,67 @@ O console H2 está disponível em `http://localhost:8082/api/h2-console` com as 
 - Username: sa
 - Password: password
 
+## Testando Batch Low Platform
+
+### 1. Verificar Status do Batch
+
+**Usando curl:**
+
+```bash
+curl -X GET http://localhost:8083/api/batch/status
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "status": "UP",
+  "service": "Batch Low Platform",
+  "timestamp": "2023-05-20T15:30:45.123"
+}
+```
+
+### 2. Verificar Saúde do Batch
+
+**Usando curl:**
+
+```bash
+curl -X GET http://localhost:8083/api/batch/health
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "status": "UP",
+  "service": "Batch Low Platform"
+}
+```
+
+### 3. Iniciar o Job de Batch
+
+**Usando curl:**
+
+```bash
+curl -X POST http://localhost:8083/api/batch/start
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "status": "Job started successfully",
+  "timestamp": "2023-05-20T15:30:45.123"
+}
+```
+
+### 4. Acessar o Console H2 do Batch
+
+O console H2 está disponível em `http://localhost:8083/h2-console` com as seguintes credenciais:
+- JDBC URL: jdbc:h2:mem:batchdb
+- Username: sa
+- Password: password
+
 ## Testando Endpoints SOAP
 
 ### 1. Calculator SOAP Service
@@ -480,6 +541,8 @@ Para testar os serviços REST com Postman:
    - GET `http://localhost:8081/api/tasks` (API REST não segura)
    - POST `http://localhost:8082/api/auth/login` (API REST segura - autenticação)
    - GET `http://localhost:8082/api/tasks` (API REST segura - com token JWT)
+   - GET `http://localhost:8083/api/batch/status` (Batch Low Platform - status)
+   - POST `http://localhost:8083/api/batch/start` (Batch Low Platform - iniciar job)
 3. Execute as requisições e verifique as respostas
 
 Para testar os serviços SOAP com Postman:

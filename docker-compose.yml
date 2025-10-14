@@ -52,6 +52,22 @@ services:
       timeout: 5s
       retries: 5
 
+  # Batch Low Platform
+  batch-low-platform:
+    build:
+      context: ./batch-low-platform
+      dockerfile: Dockerfile
+    container_name: batch-low-platform
+    ports:
+      - "8083:8083"
+    networks:
+      - taskscheduler3-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8083/api/batch/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
 networks:
   taskscheduler3-network:
     driver: bridge
