@@ -2,6 +2,15 @@
 
 Este é um serviço SOAP simples sem segurança para testes do task-scheduler.
 
+## Compilação
+
+Para compilar o projeto corretamente, use os scripts fornecidos:
+
+- Windows: `build.bat`
+- Linux/Mac: `./build.sh` (certifique-se de dar permissão de execução com `chmod +x build.sh`)
+
+Estes scripts garantem que as classes Java sejam geradas a partir do XSD antes da compilação.
+
 ## Endpoints
 
 ### SOAP Endpoints

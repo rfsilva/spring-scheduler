@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<bindings version="3.0" xmlns="https://jakarta.ee/xml/ns/jaxb">
+  <!--
+
+Este arquivo foi gerado pela Eclipse Implementation of JAXB, v3.0.0 
+Consulte https://eclipse-ee4j.github.io/jaxb-ri 
+Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
+Gerado em: 2025.10.14 às 10:33:05 AM BRT 
+
+  -->
+  <bindings scd="x-schema::tns" xmlns:tns="http://example.com/soap/calculator/secure">
+    <schemaBindings map="false">
+      <package name="com.example.soap.calculator.secure"/>
+    </schemaBindings>
+    <bindings scd="tns:addRequest">
+      <class ref="com.example.soap.calculator.secure.AddRequest"/>
+    </bindings>
+    <bindings scd="tns:addResponse">
+      <class ref="com.example.soap.calculator.secure.AddResponse"/>
+    </bindings>
+    <bindings scd="tns:subtractRequest">
+      <class ref="com.example.soap.calculator.secure.SubtractRequest"/>
+    </bindings>
+    <bindings scd="tns:subtractResponse">
+      <class ref="com.example.soap.calculator.secure.SubtractResponse"/>
+    </bindings>
+    <bindings scd="tns:multiplyRequest">
+      <class ref="com.example.soap.calculator.secure.MultiplyRequest"/>
+    </bindings>
+    <bindings scd="tns:multiplyResponse">
+      <class ref="com.example.soap.calculator.secure.MultiplyResponse"/>
+    </bindings>
+    <bindings scd="tns:divideRequest">
+      <class ref="com.example.soap.calculator.secure.DivideRequest"/>
+    </bindings>
+    <bindings scd="tns:divideResponse">
+      <class ref="com.example.soap.calculator.secure.DivideResponse"/>
+    </bindings>
+    <bindings scd="tns:statusRequest">
+      <class ref="com.example.soap.calculator.secure.StatusRequest"/>
+    </bindings>
+    <bindings scd="tns:statusResponse">
+      <class ref="com.example.soap.calculator.secure.StatusResponse"/>
+    </bindings>
+  </bindings>
+</bindings>
+

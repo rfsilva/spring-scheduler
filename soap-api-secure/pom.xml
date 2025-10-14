@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>soap-api-unsecure</artifactId>
+    <artifactId>soap-api-secure</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>soap-api-unsecure</name>
-    <description>Simple SOAP API without security for testing task-scheduler</description>
+    <name>soap-api-secure</name>
+    <description>Simple SOAP API with security for testing task-scheduler</description>
     
     <properties>
         <java.version>21</java.version>
@@ -26,6 +26,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web-services</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
             <groupId>wsdl4j</groupId>
@@ -82,7 +86,7 @@
                     <sources>
                         <source>${project.basedir}/src/main/resources/xsd</source>
                     </sources>
-                    <packageName>com.example.soap.generated</packageName>
+                    <packageName>com.example.soap.secure.generated</packageName>
                     <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
                     <clearOutputDir>false</clearOutputDir>
                 </configuration>

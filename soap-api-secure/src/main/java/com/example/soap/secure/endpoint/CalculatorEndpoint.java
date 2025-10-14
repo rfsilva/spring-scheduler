@@ -1,17 +1,19 @@
-package com.example.soap.endpoint;
+package com.example.soap.secure.endpoint;
 
-import com.example.soap.generated.AddRequest;
-import com.example.soap.generated.AddResponse;
-import com.example.soap.generated.DivideRequest;
-import com.example.soap.generated.DivideResponse;
-import com.example.soap.generated.MultiplyRequest;
-import com.example.soap.generated.MultiplyResponse;
-import com.example.soap.generated.StatusRequest;
-import com.example.soap.generated.StatusResponse;
-import com.example.soap.generated.SubtractRequest;
-import com.example.soap.generated.SubtractResponse;
-import com.example.soap.service.CalculatorService;
+import com.example.soap.secure.generated.AddRequest;
+import com.example.soap.secure.generated.AddResponse;
+import com.example.soap.secure.generated.DivideRequest;
+import com.example.soap.secure.generated.DivideResponse;
+import com.example.soap.secure.generated.MultiplyRequest;
+import com.example.soap.secure.generated.MultiplyResponse;
+import com.example.soap.secure.generated.StatusRequest;
+import com.example.soap.secure.generated.StatusResponse;
+import com.example.soap.secure.generated.SubtractRequest;
+import com.example.soap.secure.generated.SubtractResponse;
+import com.example.soap.secure.service.CalculatorService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
@@ -26,7 +28,7 @@ import java.util.GregorianCalendar;
 @Endpoint
 public class CalculatorEndpoint {
 
-    private static final String NAMESPACE_URI = "http://example.com/soap/calculator";
+    private static final String NAMESPACE_URI = "http://example.com/soap/calculator/secure";
 
     private final CalculatorService calculatorService;
 
@@ -72,6 +74,11 @@ public class CalculatorEndpoint {
     public StatusResponse status(@RequestPayload StatusRequest request) {
         StatusResponse response = new StatusResponse();
         response.setStatus("UP");
+        
+        // Get authenticated user
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication != null ? authentication.getName() : "anonymous";
+        response.setUser(username);
         
         try {
             GregorianCalendar gregorianCalendar = GregorianCalendar.from(

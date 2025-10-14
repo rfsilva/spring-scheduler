@@ -1,0 +1,6 @@
+@echo off
+echo Gerando classes a partir do XSD...
+call mvnw.cmd jaxb2:xjc
+echo Compilando o projeto...
+call mvnw.cmd clean package -DskipTests
+echo Compilação concluída!

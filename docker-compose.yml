@@ -83,6 +83,22 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      
+  # SOAP API Secure
+  soap-api-secure:
+    build:
+      context: ./soap-api-secure
+      dockerfile: Dockerfile
+    container_name: soap-api-secure
+    ports:
+      - "8085:8085"
+    networks:
+      - taskscheduler3-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 networks:
   taskscheduler3-network:
