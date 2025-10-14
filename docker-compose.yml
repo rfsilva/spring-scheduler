@@ -100,9 +100,128 @@ services:
       timeout: 5s
       retries: 5
 
+  # Zookeeper (necessário para o Kafka)
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: taskscheduler-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    networks:
+      - taskscheduler3-network
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "2181"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Kafka
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: taskscheduler-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    networks:
+      - taskscheduler3-network
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--bootstrap-server", "localhost:9092", "--list"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Kafka UI - Interface web para gerenciar o Kafka
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: taskscheduler-kafka-ui
+    depends_on:
+      - kafka
+    ports:
+      - "8090:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+    networks:
+      - taskscheduler3-network
+
+  # Kafka Init - Serviço para criar tópicos no Kafka
+  kafka-init:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: taskscheduler-kafka-init
+    depends_on:
+      - kafka
+    command: >
+      bash -c "
+        echo 'Esperando Kafka estar disponível...'
+        sleep 20
+        echo 'Criando tópicos...'
+        kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic task-notifications --partitions 3 --replication-factor 1
+        kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic task-events --partitions 3 --replication-factor 1
+        kafka-topics --bootstrap-server kafka:9092 --create --if-not-exists --topic task-results --partitions 3 --replication-factor 1
+        echo 'Tópicos criados com sucesso!'
+      "
+    networks:
+      - taskscheduler3-network
+
+  # RabbitMQ
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: taskscheduler-rabbitmq
+    ports:
+      - "5672:5672"   # Porta AMQP
+      - "15672:15672" # Porta da interface de gerenciamento
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - taskscheduler3-network
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # RabbitMQ Init - Serviço para criar filas no RabbitMQ
+  rabbitmq-init:
+    image: rabbitmq:3-management
+    container_name: taskscheduler-rabbitmq-init
+    depends_on:
+      - rabbitmq
+    command: >
+      bash -c "
+        echo 'Esperando RabbitMQ estar disponível...'
+        sleep 30
+        echo 'Criando filas e exchanges...'
+        rabbitmqadmin --host rabbitmq --port 15672 --username admin --password admin123 declare exchange name=task-exchange type=direct
+        rabbitmqadmin --host rabbitmq --port 15672 --username admin --password admin123 declare queue name=task-queue durable=true
+        rabbitmqadmin --host rabbitmq --port 15672 --username admin --password admin123 declare binding source=task-exchange destination=task-queue routing_key=task-routing-key
+        rabbitmqadmin --host rabbitmq --port 15672 --username admin --password admin123 declare exchange name=notification-exchange type=topic
+        rabbitmqadmin --host rabbitmq --port 15672 --username admin --password admin123 declare queue name=notification-queue durable=true
+        rabbitmqadmin --host rabbitmq --port 15672 --username admin --password admin123 declare binding source=notification-exchange destination=notification-queue routing_key=notification.#
+        echo 'Filas e exchanges criados com sucesso!'
+      "
+    networks:
+      - taskscheduler3-network
+
 networks:
   taskscheduler3-network:
     driver: bridge
 
 volumes:
   mysql-data:
+  rabbitmq-data:
