@@ -56,67 +56,81 @@ export enum DeliveryMode {
   NON_PERSISTENT = 'NON_PERSISTENT'
 }
 
-// Interfaces
+// Novo enum para HighPlatformBatchConfig
+export enum EndpointType {
+  JES = 'JES',
+  CICS = 'CICS',
+  MQ = 'MQ',
+  API = 'API',
+  OTHER = 'OTHER'
+}
+
+// Interfaces atualizadas
 export interface RestTaskConfig {
   id?: number;
   url: string;
   method: HttpMethod;
-  headers?: string;
+  headers: string; // Agora obrigatório
   body?: string;
   authType: RestAuthType;
-  username?: string;
-  password?: string;
-  token?: string;
-  apiKeyName?: string;
-  apiKeyValue?: string;
-  connectTimeoutSeconds?: number;
-  readTimeoutSeconds?: number;
+  timeout: number; // Novo campo obrigatório
+  retryPolicy?: string; // Novo campo
+  tokenEndpoint?: string; // Novo campo
+  clientId?: string; // Novo campo
+  clientSecret?: string; // Novo campo
+  certificatePath?: string; // Novo campo
 }
 
 export interface SoapTaskConfig {
   id?: number;
-  endpointUrl: string;
+  wsdlUrl: string; // Renomeado de endpointUrl
+  operation: string; // Novo campo obrigatório
+  namespace: string; // Novo campo obrigatório
   soapAction?: string;
   requestXml: string;
   authType: SoapAuthType;
-  username?: string;
-  password?: string;
-  connectTimeoutSeconds?: number;
-  readTimeoutSeconds?: number;
+  username: string; // Agora obrigatório
+  password: string; // Agora obrigatório
+  timeout: number; // Novo campo obrigatório
+  customHeaders?: string; // Novo campo
 }
 
 export interface LowPlatformBatchConfig {
   id?: number;
+  jobName: string; // Novo campo obrigatório
   command: string;
-  workingDirectory?: string;
-  environmentVariables?: string;
-  successExitCodes?: string;
-  onSuccessCommand?: string;
-  onFailureCommand?: string;
-  timeoutSeconds?: number;
+  parameters?: string; // Novo campo
+  workingDirectory: string; // Agora obrigatório
+  timeout: number; // Renomeado de timeoutSeconds
+  runAsUser?: string; // Novo campo
+  onSuccess?: string; // Renomeado de onSuccessCommand
+  onFailure?: string; // Renomeado de onFailureCommand
 }
 
 export interface HighPlatformBatchConfig {
   id?: number;
-  systemType: string;
-  jobName: string;
-  parameters?: string;
-  credentials?: string;
-  connectionDetails?: string;
-  timeoutSeconds?: number;
+  endpointType: EndpointType; // Novo campo obrigatório
+  transactionId: string; // Novo campo obrigatório
+  payload: string; // Novo campo obrigatório
+  credentials: string; // Já existia
+  timeout: number; // Renomeado de timeoutSeconds
+  channel?: string; // Novo campo
+  queue?: string; // Novo campo
+  host?: string; // Novo campo
+  port?: string; // Novo campo
+  sslCertPath?: string; // Novo campo
 }
 
 export interface MessagingTaskConfig {
   id?: number;
   brokerType: BrokerType;
-  destination: string;
-  message: string;
-  connectionProperties?: string;
+  destinationName: string; // Renomeado de destination
+  messagePayload: string; // Renomeado de message
+  connectionUrl: string; // Renomeado de connectionProperties
   authType: MessagingAuthType;
-  username?: string;
-  password?: string;
+  headers: string; // Novo campo obrigatório
   deliveryMode: DeliveryMode;
-  timeoutSeconds?: number;
+  retryPolicy?: string; // Novo campo
 }
 
 export interface ScheduledTask {

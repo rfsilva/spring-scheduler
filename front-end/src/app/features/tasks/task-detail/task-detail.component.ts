@@ -10,7 +10,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { TaskService } from '../../../core/services/task.service';
-import { ScheduledTask, TaskStatus } from '../../../core/models/scheduled-task.model';
+import { ScheduledTask, TaskStatus, EndpointType } from '../../../core/models/scheduled-task.model';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
@@ -35,6 +35,7 @@ export class TaskDetailComponent implements OnInit {
   task?: ScheduledTask;
   loading = true;
   taskId!: number;
+  EndpointType = EndpointType; // Expor o enum para o template
 
   constructor(
     private taskService: TaskService,

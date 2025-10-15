@@ -24,7 +24,8 @@ import {
   SoapAuthType, 
   BrokerType, 
   MessagingAuthType, 
-  DeliveryMode 
+  DeliveryMode,
+  EndpointType
 } from '../../../core/models/scheduled-task.model';
 
 @Component({
@@ -66,6 +67,7 @@ export class TaskFormComponent implements OnInit {
   BrokerType = BrokerType;
   MessagingAuthType = MessagingAuthType;
   DeliveryMode = DeliveryMode;
+  EndpointType = EndpointType;
   
   // Convert enums to arrays for template
   taskTypes = Object.values(TaskType);
@@ -76,6 +78,7 @@ export class TaskFormComponent implements OnInit {
   brokerTypes = Object.values(BrokerType);
   messagingAuthTypes = Object.values(MessagingAuthType);
   deliveryModes = Object.values(DeliveryMode);
+  endpointTypes = Object.values(EndpointType);
 
   constructor(
     private fb: FormBuilder,
@@ -101,6 +104,11 @@ export class TaskFormComponent implements OnInit {
     this.taskForm.get('taskType')?.valueChanges.subscribe(taskType => {
       this.updateConfigFormVisibility(taskType);
     });
+
+    // Adicionar listeners para validações específicas
+    this.taskForm.get('highPlatformBatchConfig.endpointType')?.valueChanges.subscribe(endpointType => {
+      this.updateHighPlatformValidators(endpointType);
+    });
   }
 
   initForm(): void {
@@ -117,62 +125,67 @@ export class TaskFormComponent implements OnInit {
       restTaskConfig: this.fb.group({
         url: ['', [Validators.required]],
         method: [HttpMethod.GET, [Validators.required]],
-        headers: [''],
+        headers: ['', [Validators.required]], // Agora obrigatório
         body: [''],
         authType: [RestAuthType.NONE, [Validators.required]],
-        username: [''],
-        password: [''],
-        token: [''],
-        apiKeyName: [''],
-        apiKeyValue: [''],
-        connectTimeoutSeconds: [30],
-        readTimeoutSeconds: [30]
+        timeout: [30, [Validators.required]], // Novo campo obrigatório
+        retryPolicy: [''],
+        tokenEndpoint: [''],
+        clientId: [''],
+        clientSecret: [''],
+        certificatePath: ['']
       }),
       
       // SOAP Task Config
       soapTaskConfig: this.fb.group({
-        endpointUrl: ['', [Validators.required]],
+        wsdlUrl: ['', [Validators.required]], // Renomeado de endpointUrl
+        operation: ['', [Validators.required]], // Novo campo obrigatório
+        namespace: ['', [Validators.required]], // Novo campo obrigatório
         soapAction: [''],
         requestXml: ['', [Validators.required]],
         authType: [SoapAuthType.NONE, [Validators.required]],
-        username: [''],
-        password: [''],
-        connectTimeoutSeconds: [30],
-        readTimeoutSeconds: [30]
+        username: ['', [Validators.required]], // Agora obrigatório
+        password: ['', [Validators.required]], // Agora obrigatório
+        timeout: [30, [Validators.required]], // Novo campo obrigatório
+        customHeaders: ['']
       }),
       
       // Low Platform Batch Config
       lowPlatformBatchConfig: this.fb.group({
+        jobName: ['', [Validators.required]], // Novo campo obrigatório
         command: ['', [Validators.required]],
-        workingDirectory: [''],
-        environmentVariables: [''],
-        successExitCodes: ['0'],
-        onSuccessCommand: [''],
-        onFailureCommand: [''],
-        timeoutSeconds: [300]
+        parameters: [''],
+        workingDirectory: ['', [Validators.required]], // Agora obrigatório
+        timeout: [300, [Validators.required]], // Renomeado de timeoutSeconds
+        runAsUser: [''],
+        onSuccess: [''], // Renomeado de onSuccessCommand
+        onFailure: [''] // Renomeado de onFailureCommand
       }),
       
       // High Platform Batch Config
       highPlatformBatchConfig: this.fb.group({
-        systemType: ['', [Validators.required]],
-        jobName: ['', [Validators.required]],
-        parameters: [''],
-        credentials: [''],
-        connectionDetails: [''],
-        timeoutSeconds: [300]
+        endpointType: [EndpointType.JES, [Validators.required]], // Novo campo obrigatório
+        transactionId: ['', [Validators.required]], // Novo campo obrigatório
+        payload: ['', [Validators.required]], // Novo campo obrigatório
+        credentials: ['', [Validators.required]],
+        timeout: [300, [Validators.required]], // Renomeado de timeoutSeconds
+        channel: [''],
+        queue: [''],
+        host: [''],
+        port: [''],
+        sslCertPath: ['']
       }),
       
       // Messaging Task Config
       messagingTaskConfig: this.fb.group({
         brokerType: [BrokerType.KAFKA, [Validators.required]],
-        destination: ['', [Validators.required]],
-        message: ['', [Validators.required]],
-        connectionProperties: [''],
+        destinationName: ['', [Validators.required]], // Renomeado de destination
+        messagePayload: ['', [Validators.required]], // Renomeado de message
+        connectionUrl: ['', [Validators.required]], // Renomeado de connectionProperties
         authType: [MessagingAuthType.NONE, [Validators.required]],
-        username: [''],
-        password: [''],
+        headers: ['', [Validators.required]], // Novo campo obrigatório
         deliveryMode: [DeliveryMode.PERSISTENT, [Validators.required]],
-        timeoutSeconds: [30]
+        retryPolicy: ['']
       })
     });
     
@@ -226,6 +239,8 @@ export class TaskFormComponent implements OnInit {
       case TaskType.HIGH_PLATFORM_BATCH:
         if (task.highPlatformBatchConfig) {
           this.taskForm.get('highPlatformBatchConfig')?.patchValue(task.highPlatformBatchConfig);
+          // Atualizar validadores específicos para o tipo de endpoint
+          this.updateHighPlatformValidators(task.highPlatformBatchConfig.endpointType);
         }
         break;
       case TaskType.MESSAGING:
@@ -267,6 +282,11 @@ export class TaskFormComponent implements OnInit {
         break;
       case TaskType.HIGH_PLATFORM_BATCH:
         highPlatformConfig?.enable();
+        // Atualizar validadores específicos para o tipo de endpoint
+        const endpointType = this.taskForm.get('highPlatformBatchConfig.endpointType')?.value;
+        if (endpointType) {
+          this.updateHighPlatformValidators(endpointType);
+        }
         break;
       case TaskType.MESSAGING:
         messagingConfig?.enable();
@@ -274,10 +294,75 @@ export class TaskFormComponent implements OnInit {
     }
   }
 
+  // Método para atualizar validadores específicos para HighPlatformBatchConfig
+  updateHighPlatformValidators(endpointType: EndpointType): void {
+    const channelControl = this.taskForm.get('highPlatformBatchConfig.channel');
+    const queueControl = this.taskForm.get('highPlatformBatchConfig.queue');
+    const hostControl = this.taskForm.get('highPlatformBatchConfig.host');
+    const portControl = this.taskForm.get('highPlatformBatchConfig.port');
+    const sslCertPathControl = this.taskForm.get('highPlatformBatchConfig.sslCertPath');
+
+    // Resetar validadores
+    channelControl?.clearValidators();
+    queueControl?.clearValidators();
+    hostControl?.clearValidators();
+    portControl?.clearValidators();
+    sslCertPathControl?.clearValidators();
+
+    // Aplicar validadores específicos com base no tipo de endpoint
+    if (endpointType === EndpointType.MQ) {
+      channelControl?.setValidators([Validators.required]);
+      queueControl?.setValidators([Validators.required]);
+    } else if (endpointType === EndpointType.API) {
+      hostControl?.setValidators([Validators.required]);
+      portControl?.setValidators([Validators.required]);
+      sslCertPathControl?.setValidators([Validators.required]);
+    }
+
+    // Atualizar estado dos controles
+    channelControl?.updateValueAndValidity();
+    queueControl?.updateValueAndValidity();
+    hostControl?.updateValueAndValidity();
+    portControl?.updateValueAndValidity();
+    sslCertPathControl?.updateValueAndValidity();
+  }
+
+  // Método para validar RestTaskConfig - CORRIGIDO conforme análise
+  validateRestTaskConfig(): boolean {
+    const config = this.taskForm.get('restTaskConfig')?.value;
+    if (!config) return false;
+
+    if (config.tokenEndpoint) {
+      return true;
+    } else if (config.clientId && config.clientSecret) {
+      return true;
+    } else {
+      this.snackBar.open('Client ID e Client Secret são obrigatórios quando Token Endpoint não é fornecido', 'Fechar', { duration: 3000 });
+      return false;
+    }
+  }
+
   onSubmit(): void {
     if (this.taskForm.invalid) {
       this.markFormGroupTouched(this.taskForm);
       this.snackBar.open('Por favor, corrija os erros no formulário', 'Fechar', { duration: 3000 });
+      return;
+    }
+
+    // Validações específicas com base no tipo de tarefa
+    const taskType = this.taskForm.get('taskType')?.value;
+    let isValid = true;
+
+    switch (taskType) {
+      case TaskType.REST_CALL:
+        isValid = this.validateRestTaskConfig();
+        break;
+      case TaskType.HIGH_PLATFORM_BATCH:
+        // A validação já é feita pelos validadores dinâmicos
+        break;
+    }
+
+    if (!isValid) {
       return;
     }
     
@@ -291,8 +376,9 @@ export class TaskFormComponent implements OnInit {
           this.snackBar.open('Tarefa atualizada com sucesso', 'Fechar', { duration: 3000 });
           this.router.navigate(['/tasks', this.taskId]);
         },
-        error: () => {
+        error: (error) => {
           this.submitting = false;
+          this.snackBar.open(`Erro ao atualizar tarefa: ${error.error?.message || 'Erro desconhecido'}`, 'Fechar', { duration: 5000 });
         }
       });
     } else {
@@ -302,8 +388,9 @@ export class TaskFormComponent implements OnInit {
           this.snackBar.open('Tarefa criada com sucesso', 'Fechar', { duration: 3000 });
           this.router.navigate(['/tasks', createdTask.id]);
         },
-        error: () => {
+        error: (error) => {
           this.submitting = false;
+          this.snackBar.open(`Erro ao criar tarefa: ${error.error?.message || 'Erro desconhecido'}`, 'Fechar', { duration: 5000 });
         }
       });
     }

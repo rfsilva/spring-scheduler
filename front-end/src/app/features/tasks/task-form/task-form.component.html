@@ -121,54 +121,14 @@
             </mat-form-field>
           </div>
           
-          <!-- Auth fields based on selected auth type -->
-          <ng-container [ngSwitch]="taskForm.get('restTaskConfig.authType')?.value">
-            <!-- Basic Auth -->
-            <ng-container *ngSwitchCase="RestAuthType.BASIC">
-              <div class="form-row two-columns">
-                <mat-form-field appearance="outline">
-                  <mat-label>Usuário</mat-label>
-                  <input matInput formControlName="username">
-                </mat-form-field>
-                
-                <mat-form-field appearance="outline">
-                  <mat-label>Senha</mat-label>
-                  <input matInput type="password" formControlName="password">
-                </mat-form-field>
-              </div>
-            </ng-container>
-            
-            <!-- Bearer Token -->
-            <ng-container *ngSwitchCase="RestAuthType.BEARER">
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Token</mat-label>
-                  <input matInput formControlName="token">
-                </mat-form-field>
-              </div>
-            </ng-container>
-            
-            <!-- API Key -->
-            <ng-container *ngSwitchCase="RestAuthType.API_KEY">
-              <div class="form-row two-columns">
-                <mat-form-field appearance="outline">
-                  <mat-label>Nome da API Key</mat-label>
-                  <input matInput formControlName="apiKeyName">
-                </mat-form-field>
-                
-                <mat-form-field appearance="outline">
-                  <mat-label>Valor da API Key</mat-label>
-                  <input matInput formControlName="apiKeyValue">
-                </mat-form-field>
-              </div>
-            </ng-container>
-          </ng-container>
-          
           <div class="form-row">
             <mat-form-field appearance="outline">
               <mat-label>Headers</mat-label>
               <textarea matInput formControlName="headers" placeholder="Content-Type: application/json&#10;Accept: application/json" rows="3"></textarea>
               <mat-hint>Um header por linha no formato "nome: valor"</mat-hint>
+              @if (taskForm.get('restTaskConfig.headers')?.invalid && taskForm.get('restTaskConfig.headers')?.touched) {
+                <mat-error>Headers são obrigatórios</mat-error>
+              }
             </mat-form-field>
           </div>
           
@@ -179,15 +139,50 @@
             </mat-form-field>
           </div>
           
-          <div class="form-row two-columns">
+          <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Timeout de Conexão (segundos)</mat-label>
-              <input matInput type="number" formControlName="connectTimeoutSeconds" min="1">
+              <mat-label>Timeout (segundos)</mat-label>
+              <input matInput type="number" formControlName="timeout" min="1">
+              @if (taskForm.get('restTaskConfig.timeout')?.invalid && taskForm.get('restTaskConfig.timeout')?.touched) {
+                <mat-error>Timeout é obrigatório</mat-error>
+              }
             </mat-form-field>
-            
+          </div>
+          
+          <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Timeout de Leitura (segundos)</mat-label>
-              <input matInput type="number" formControlName="readTimeoutSeconds" min="1">
+              <mat-label>Política de Retry</mat-label>
+              <input matInput formControlName="retryPolicy" placeholder="exponential,3,1000">
+              <mat-hint>Formato: tipo,tentativas,intervalo</mat-hint>
+            </mat-form-field>
+          </div>
+          
+          <!-- Campos específicos para autenticação OAuth -->
+          @if (taskForm.get('restTaskConfig.authType')?.value === RestAuthType.BEARER) {
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Token Endpoint</mat-label>
+                <input matInput formControlName="tokenEndpoint" placeholder="https://auth.example.com/token">
+              </mat-form-field>
+            </div>
+            
+            <div class="form-row two-columns">
+              <mat-form-field appearance="outline">
+                <mat-label>Client ID</mat-label>
+                <input matInput formControlName="clientId">
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Client Secret</mat-label>
+                <input matInput type="password" formControlName="clientSecret">
+              </mat-form-field>
+            </div>
+          }
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Caminho do Certificado</mat-label>
+              <input matInput formControlName="certificatePath" placeholder="/path/to/certificate.pem">
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -202,10 +197,30 @@
         <mat-card-content>
           <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>URL do Endpoint</mat-label>
-              <input matInput formControlName="endpointUrl" placeholder="http://example.com/soap-service">
-              @if (taskForm.get('soapTaskConfig.endpointUrl')?.invalid && taskForm.get('soapTaskConfig.endpointUrl')?.touched) {
-                <mat-error>URL do Endpoint é obrigatória</mat-error>
+              <mat-label>URL do WSDL</mat-label>
+              <input matInput formControlName="wsdlUrl" placeholder="http://example.com/service.wsdl">
+              @if (taskForm.get('soapTaskConfig.wsdlUrl')?.invalid && taskForm.get('soapTaskConfig.wsdlUrl')?.touched) {
+                <mat-error>URL do WSDL é obrigatória</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Operação</mat-label>
+              <input matInput formControlName="operation" placeholder="GetData">
+              @if (taskForm.get('soapTaskConfig.operation')?.invalid && taskForm.get('soapTaskConfig.operation')?.touched) {
+                <mat-error>Operação é obrigatória</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Namespace</mat-label>
+              <input matInput formControlName="namespace" placeholder="http://example.com/namespace">
+              @if (taskForm.get('soapTaskConfig.namespace')?.invalid && taskForm.get('soapTaskConfig.namespace')?.touched) {
+                <mat-error>Namespace é obrigatório</mat-error>
               }
             </mat-form-field>
           </div>
@@ -228,38 +243,23 @@
             </mat-form-field>
           </div>
           
-          <!-- Auth fields based on selected auth type -->
-          <ng-container [ngSwitch]="taskForm.get('soapTaskConfig.authType')?.value">
-            <!-- Basic Auth -->
-            <ng-container *ngSwitchCase="SoapAuthType.BASIC">
-              <div class="form-row two-columns">
-                <mat-form-field appearance="outline">
-                  <mat-label>Usuário</mat-label>
-                  <input matInput formControlName="username">
-                </mat-form-field>
-                
-                <mat-form-field appearance="outline">
-                  <mat-label>Senha</mat-label>
-                  <input matInput type="password" formControlName="password">
-                </mat-form-field>
-              </div>
-            </ng-container>
+          <div class="form-row two-columns">
+            <mat-form-field appearance="outline">
+              <mat-label>Usuário</mat-label>
+              <input matInput formControlName="username">
+              @if (taskForm.get('soapTaskConfig.username')?.invalid && taskForm.get('soapTaskConfig.username')?.touched) {
+                <mat-error>Usuário é obrigatório</mat-error>
+              }
+            </mat-form-field>
             
-            <!-- WS Security -->
-            <ng-container *ngSwitchCase="SoapAuthType.WS_SECURITY">
-              <div class="form-row two-columns">
-                <mat-form-field appearance="outline">
-                  <mat-label>Usuário</mat-label>
-                  <input matInput formControlName="username">
-                </mat-form-field>
-                
-                <mat-form-field appearance="outline">
-                  <mat-label>Senha</mat-label>
-                  <input matInput type="password" formControlName="password">
-                </mat-form-field>
-              </div>
-            </ng-container>
-          </ng-container>
+            <mat-form-field appearance="outline">
+              <mat-label>Senha</mat-label>
+              <input matInput type="password" formControlName="password">
+              @if (taskForm.get('soapTaskConfig.password')?.invalid && taskForm.get('soapTaskConfig.password')?.touched) {
+                <mat-error>Senha é obrigatória</mat-error>
+              }
+            </mat-form-field>
+          </div>
           
           <div class="form-row">
             <mat-form-field appearance="outline">
@@ -276,15 +276,21 @@
             </mat-form-field>
           </div>
           
-          <div class="form-row two-columns">
+          <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Timeout de Conexão (segundos)</mat-label>
-              <input matInput type="number" formControlName="connectTimeoutSeconds" min="1">
+              <mat-label>Headers Customizados</mat-label>
+              <textarea matInput formControlName="customHeaders" placeholder="Header1: value1&#10;Header2: value2" rows="3"></textarea>
+              <mat-hint>Um header por linha no formato "nome: valor"</mat-hint>
             </mat-form-field>
-            
+          </div>
+          
+          <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Timeout de Leitura (segundos)</mat-label>
-              <input matInput type="number" formControlName="readTimeoutSeconds" min="1">
+              <mat-label>Timeout (segundos)</mat-label>
+              <input matInput type="number" formControlName="timeout" min="1">
+              @if (taskForm.get('soapTaskConfig.timeout')?.invalid && taskForm.get('soapTaskConfig.timeout')?.touched) {
+                <mat-error>Timeout é obrigatório</mat-error>
+              }
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -299,6 +305,16 @@
         <mat-card-content>
           <div class="form-row">
             <mat-form-field appearance="outline">
+              <mat-label>Nome do Job</mat-label>
+              <input matInput formControlName="jobName" placeholder="daily-processing">
+              @if (taskForm.get('lowPlatformBatchConfig.jobName')?.invalid && taskForm.get('lowPlatformBatchConfig.jobName')?.touched) {
+                <mat-error>Nome do Job é obrigatório</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
               <mat-label>Comando</mat-label>
               <input matInput formControlName="command" placeholder="python script.py">
               @if (taskForm.get('lowPlatformBatchConfig.command')?.invalid && taskForm.get('lowPlatformBatchConfig.command')?.touched) {
@@ -309,45 +325,49 @@
           
           <div class="form-row">
             <mat-form-field appearance="outline">
+              <mat-label>Parâmetros</mat-label>
+              <input matInput formControlName="parameters" placeholder="--input=file.csv --output=result.json">
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
               <mat-label>Diretório de Trabalho</mat-label>
               <input matInput formControlName="workingDirectory" placeholder="/path/to/directory">
+              @if (taskForm.get('lowPlatformBatchConfig.workingDirectory')?.invalid && taskForm.get('lowPlatformBatchConfig.workingDirectory')?.touched) {
+                <mat-error>Diretório de Trabalho é obrigatório</mat-error>
+              }
             </mat-form-field>
           </div>
           
           <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Variáveis de Ambiente</mat-label>
-              <textarea matInput formControlName="environmentVariables" placeholder="ENV_VAR1=value1&#10;ENV_VAR2=value2" rows="3"></textarea>
-              <mat-hint>Uma variável por linha no formato "NOME=valor"</mat-hint>
-            </mat-form-field>
-          </div>
-          
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Códigos de Saída de Sucesso</mat-label>
-              <input matInput formControlName="successExitCodes" placeholder="0,1,2">
-              <mat-hint>Códigos separados por vírgula (padrão: 0)</mat-hint>
+              <mat-label>Usuário de Execução</mat-label>
+              <input matInput formControlName="runAsUser" placeholder="username">
             </mat-form-field>
           </div>
           
           <div class="form-row">
             <mat-form-field appearance="outline">
               <mat-label>Comando em Caso de Sucesso</mat-label>
-              <input matInput formControlName="onSuccessCommand" placeholder="echo 'Success'">
+              <input matInput formControlName="onSuccess" placeholder="echo 'Success'">
             </mat-form-field>
           </div>
           
           <div class="form-row">
             <mat-form-field appearance="outline">
               <mat-label>Comando em Caso de Falha</mat-label>
-              <input matInput formControlName="onFailureCommand" placeholder="echo 'Failed'">
+              <input matInput formControlName="onFailure" placeholder="echo 'Failed'">
             </mat-form-field>
           </div>
           
           <div class="form-row">
             <mat-form-field appearance="outline">
               <mat-label>Timeout (segundos)</mat-label>
-              <input matInput type="number" formControlName="timeoutSeconds" min="1">
+              <input matInput type="number" formControlName="timeout" min="1">
+              @if (taskForm.get('lowPlatformBatchConfig.timeout')?.invalid && taskForm.get('lowPlatformBatchConfig.timeout')?.touched) {
+                <mat-error>Timeout é obrigatório</mat-error>
+              }
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -362,28 +382,35 @@
         <mat-card-content>
           <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Tipo de Sistema</mat-label>
-              <input matInput formControlName="systemType" placeholder="JES, CICS, API, MQ">
-              @if (taskForm.get('highPlatformBatchConfig.systemType')?.invalid && taskForm.get('highPlatformBatchConfig.systemType')?.touched) {
-                <mat-error>Tipo de Sistema é obrigatório</mat-error>
+              <mat-label>Tipo de Endpoint</mat-label>
+              <mat-select formControlName="endpointType">
+                @for (type of endpointTypes; track type) {
+                  <mat-option [value]="type">{{ type }}</mat-option>
+                }
+              </mat-select>
+              @if (taskForm.get('highPlatformBatchConfig.endpointType')?.invalid && taskForm.get('highPlatformBatchConfig.endpointType')?.touched) {
+                <mat-error>Tipo de Endpoint é obrigatório</mat-error>
               }
             </mat-form-field>
           </div>
           
           <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Nome do Job</mat-label>
-              <input matInput formControlName="jobName" placeholder="BATCH001">
-              @if (taskForm.get('highPlatformBatchConfig.jobName')?.invalid && taskForm.get('highPlatformBatchConfig.jobName')?.touched) {
-                <mat-error>Nome do Job é obrigatório</mat-error>
+              <mat-label>ID da Transação</mat-label>
+              <input matInput formControlName="transactionId" placeholder="TRAN001">
+              @if (taskForm.get('highPlatformBatchConfig.transactionId')?.invalid && taskForm.get('highPlatformBatchConfig.transactionId')?.touched) {
+                <mat-error>ID da Transação é obrigatório</mat-error>
               }
             </mat-form-field>
           </div>
           
           <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Parâmetros</mat-label>
-              <textarea matInput formControlName="parameters" placeholder="PARAM1=VALUE1&#10;PARAM2=VALUE2" rows="3"></textarea>
+              <mat-label>Payload</mat-label>
+              <textarea matInput formControlName="payload" placeholder='{"data": "value"}' rows="5"></textarea>
+              @if (taskForm.get('highPlatformBatchConfig.payload')?.invalid && taskForm.get('highPlatformBatchConfig.payload')?.touched) {
+                <mat-error>Payload é obrigatório</mat-error>
+              }
             </mat-form-field>
           </div>
           
@@ -391,20 +418,71 @@
             <mat-form-field appearance="outline">
               <mat-label>Credenciais</mat-label>
               <textarea matInput formControlName="credentials" placeholder="username=user&#10;password=pass" rows="2"></textarea>
+              @if (taskForm.get('highPlatformBatchConfig.credentials')?.invalid && taskForm.get('highPlatformBatchConfig.credentials')?.touched) {
+                <mat-error>Credenciais são obrigatórias</mat-error>
+              }
             </mat-form-field>
           </div>
           
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Detalhes de Conexão</mat-label>
-              <textarea matInput formControlName="connectionDetails" placeholder="host=mainframe.example.com&#10;port=1234" rows="3"></textarea>
-            </mat-form-field>
-          </div>
+          <!-- Campos específicos para MQ -->
+          @if (taskForm.get('highPlatformBatchConfig.endpointType')?.value === EndpointType.MQ) {
+            <div class="form-row two-columns">
+              <mat-form-field appearance="outline">
+                <mat-label>Canal</mat-label>
+                <input matInput formControlName="channel" placeholder="SYSTEM.DEF.SVRCONN">
+                @if (taskForm.get('highPlatformBatchConfig.channel')?.invalid && taskForm.get('highPlatformBatchConfig.channel')?.touched) {
+                  <mat-error>Canal é obrigatório para MQ</mat-error>
+                }
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Fila</mat-label>
+                <input matInput formControlName="queue" placeholder="QUEUE.NAME">
+                @if (taskForm.get('highPlatformBatchConfig.queue')?.invalid && taskForm.get('highPlatformBatchConfig.queue')?.touched) {
+                  <mat-error>Fila é obrigatória para MQ</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          }
+          
+          <!-- Campos específicos para API -->
+          @if (taskForm.get('highPlatformBatchConfig.endpointType')?.value === EndpointType.API) {
+            <div class="form-row two-columns">
+              <mat-form-field appearance="outline">
+                <mat-label>Host</mat-label>
+                <input matInput formControlName="host" placeholder="api.mainframe.com">
+                @if (taskForm.get('highPlatformBatchConfig.host')?.invalid && taskForm.get('highPlatformBatchConfig.host')?.touched) {
+                  <mat-error>Host é obrigatório para API</mat-error>
+                }
+              </mat-form-field>
+              
+              <mat-form-field appearance="outline">
+                <mat-label>Porta</mat-label>
+                <input matInput formControlName="port" placeholder="443">
+                @if (taskForm.get('highPlatformBatchConfig.port')?.invalid && taskForm.get('highPlatformBatchConfig.port')?.touched) {
+                  <mat-error>Porta é obrigatória para API</mat-error>
+                }
+              </mat-form-field>
+            </div>
+            
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Caminho do Certificado SSL</mat-label>
+                <input matInput formControlName="sslCertPath" placeholder="/path/to/cert.pem">
+                @if (taskForm.get('highPlatformBatchConfig.sslCertPath')?.invalid && taskForm.get('highPlatformBatchConfig.sslCertPath')?.touched) {
+                  <mat-error>Caminho do Certificado SSL é obrigatório para API</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          }
           
           <div class="form-row">
             <mat-form-field appearance="outline">
               <mat-label>Timeout (segundos)</mat-label>
-              <input matInput type="number" formControlName="timeoutSeconds" min="1">
+              <input matInput type="number" formControlName="timeout" min="1">
+              @if (taskForm.get('highPlatformBatchConfig.timeout')?.invalid && taskForm.get('highPlatformBatchConfig.timeout')?.touched) {
+                <mat-error>Timeout é obrigatório</mat-error>
+              }
             </mat-form-field>
           </div>
         </mat-card-content>
@@ -430,10 +508,10 @@
           
           <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Destino</mat-label>
-              <input matInput formControlName="destination" placeholder="queue-name or topic-name">
-              @if (taskForm.get('messagingTaskConfig.destination')?.invalid && taskForm.get('messagingTaskConfig.destination')?.touched) {
-                <mat-error>Destino é obrigatório</mat-error>
+              <mat-label>Nome do Destino</mat-label>
+              <input matInput formControlName="destinationName" placeholder="queue-name or topic-name">
+              @if (taskForm.get('messagingTaskConfig.destinationName')?.invalid && taskForm.get('messagingTaskConfig.destinationName')?.touched) {
+                <mat-error>Nome do Destino é obrigatório</mat-error>
               }
             </mat-form-field>
           </div>
@@ -458,43 +536,42 @@
             </mat-form-field>
           </div>
           
-          <!-- Auth fields if BASIC auth is selected -->
-          @if (taskForm.get('messagingTaskConfig.authType')?.value === MessagingAuthType.BASIC) {
-            <div class="form-row two-columns">
-              <mat-form-field appearance="outline">
-                <mat-label>Usuário</mat-label>
-                <input matInput formControlName="username">
-              </mat-form-field>
-              
-              <mat-form-field appearance="outline">
-                <mat-label>Senha</mat-label>
-                <input matInput type="password" formControlName="password">
-              </mat-form-field>
-            </div>
-          }
-          
           <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Propriedades de Conexão</mat-label>
-              <textarea matInput formControlName="connectionProperties" placeholder="bootstrap.servers=localhost:9092&#10;group.id=task-scheduler" rows="3"></textarea>
-              <mat-hint>Uma propriedade por linha no formato "chave=valor"</mat-hint>
-            </mat-form-field>
-          </div>
-          
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Mensagem</mat-label>
-              <textarea matInput formControlName="message" placeholder='{"key": "value"}' rows="5"></textarea>
-              @if (taskForm.get('messagingTaskConfig.message')?.invalid && taskForm.get('messagingTaskConfig.message')?.touched) {
-                <mat-error>Mensagem é obrigatória</mat-error>
+              <mat-label>URL de Conexão</mat-label>
+              <input matInput formControlName="connectionUrl" placeholder="amqp://localhost:5672">
+              @if (taskForm.get('messagingTaskConfig.connectionUrl')?.invalid && taskForm.get('messagingTaskConfig.connectionUrl')?.touched) {
+                <mat-error>URL de Conexão é obrigatória</mat-error>
               }
             </mat-form-field>
           </div>
           
           <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>Timeout (segundos)</mat-label>
-              <input matInput type="number" formControlName="timeoutSeconds" min="1">
+              <mat-label>Headers</mat-label>
+              <textarea matInput formControlName="headers" placeholder="content-type: application/json&#10;priority: high" rows="3"></textarea>
+              <mat-hint>Um header por linha no formato "nome: valor"</mat-hint>
+              @if (taskForm.get('messagingTaskConfig.headers')?.invalid && taskForm.get('messagingTaskConfig.headers')?.touched) {
+                <mat-error>Headers são obrigatórios</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Payload da Mensagem</mat-label>
+              <textarea matInput formControlName="messagePayload" placeholder='{"key": "value"}' rows="5"></textarea>
+              @if (taskForm.get('messagingTaskConfig.messagePayload')?.invalid && taskForm.get('messagingTaskConfig.messagePayload')?.touched) {
+                <mat-error>Payload da Mensagem é obrigatório</mat-error>
+              }
+            </mat-form-field>
+          </div>
+          
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Política de Retry</mat-label>
+              <input matInput formControlName="retryPolicy" placeholder="exponential,3,1000">
+              <mat-hint>Formato: tipo,tentativas,intervalo</mat-hint>
             </mat-form-field>
           </div>
         </mat-card-content>

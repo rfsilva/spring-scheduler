@@ -63,6 +63,10 @@
               <span class="label">Tipo de Autenticação:</span>
               <span>{{ task.restTaskConfig.authType }}</span>
             </div>
+            <div class="detail-row">
+              <span class="label">Timeout (segundos):</span>
+              <span>{{ task.restTaskConfig.timeout }}</span>
+            </div>
             @if (task.restTaskConfig.headers) {
               <div class="detail-row">
                 <span class="label">Headers:</span>
@@ -75,6 +79,36 @@
                 <pre>{{ task.restTaskConfig.body }}</pre>
               </div>
             }
+            @if (task.restTaskConfig.tokenEndpoint) {
+              <div class="detail-row">
+                <span class="label">Token Endpoint:</span>
+                <span>{{ task.restTaskConfig.tokenEndpoint }}</span>
+              </div>
+            }
+            @if (task.restTaskConfig.clientId) {
+              <div class="detail-row">
+                <span class="label">Client ID:</span>
+                <span>{{ task.restTaskConfig.clientId }}</span>
+              </div>
+            }
+            @if (task.restTaskConfig.clientSecret) {
+              <div class="detail-row">
+                <span class="label">Client Secret:</span>
+                <span>******</span>
+              </div>
+            }
+            @if (task.restTaskConfig.retryPolicy) {
+              <div class="detail-row">
+                <span class="label">Política de Retry:</span>
+                <span>{{ task.restTaskConfig.retryPolicy }}</span>
+              </div>
+            }
+            @if (task.restTaskConfig.certificatePath) {
+              <div class="detail-row">
+                <span class="label">Caminho do Certificado:</span>
+                <span>{{ task.restTaskConfig.certificatePath }}</span>
+              </div>
+            }
           </div>
         }
 
@@ -83,8 +117,16 @@
           <div class="detail-section">
             <h3>Configuração SOAP</h3>
             <div class="detail-row">
-              <span class="label">URL do Endpoint:</span>
-              <span>{{ task.soapTaskConfig.endpointUrl }}</span>
+              <span class="label">URL do WSDL:</span>
+              <span>{{ task.soapTaskConfig.wsdlUrl }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Operação:</span>
+              <span>{{ task.soapTaskConfig.operation }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Namespace:</span>
+              <span>{{ task.soapTaskConfig.namespace }}</span>
             </div>
             @if (task.soapTaskConfig.soapAction) {
               <div class="detail-row">
@@ -97,9 +139,23 @@
               <span>{{ task.soapTaskConfig.authType }}</span>
             </div>
             <div class="detail-row">
+              <span class="label">Usuário:</span>
+              <span>{{ task.soapTaskConfig.username }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Timeout (segundos):</span>
+              <span>{{ task.soapTaskConfig.timeout }}</span>
+            </div>
+            <div class="detail-row">
               <span class="label">XML da Requisição:</span>
               <pre>{{ task.soapTaskConfig.requestXml }}</pre>
             </div>
+            @if (task.soapTaskConfig.customHeaders) {
+              <div class="detail-row">
+                <span class="label">Headers Customizados:</span>
+                <pre>{{ task.soapTaskConfig.customHeaders }}</pre>
+              </div>
+            }
           </div>
         }
 
@@ -108,19 +164,43 @@
           <div class="detail-section">
             <h3>Configuração de Batch (Baixa Plataforma)</h3>
             <div class="detail-row">
+              <span class="label">Nome do Job:</span>
+              <span>{{ task.lowPlatformBatchConfig.jobName }}</span>
+            </div>
+            <div class="detail-row">
               <span class="label">Comando:</span>
               <span>{{ task.lowPlatformBatchConfig.command }}</span>
             </div>
-            @if (task.lowPlatformBatchConfig.workingDirectory) {
+            @if (task.lowPlatformBatchConfig.parameters) {
               <div class="detail-row">
-                <span class="label">Diretório de Trabalho:</span>
-                <span>{{ task.lowPlatformBatchConfig.workingDirectory }}</span>
+                <span class="label">Parâmetros:</span>
+                <span>{{ task.lowPlatformBatchConfig.parameters }}</span>
               </div>
             }
-            @if (task.lowPlatformBatchConfig.environmentVariables) {
+            <div class="detail-row">
+              <span class="label">Diretório de Trabalho:</span>
+              <span>{{ task.lowPlatformBatchConfig.workingDirectory }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Timeout (segundos):</span>
+              <span>{{ task.lowPlatformBatchConfig.timeout }}</span>
+            </div>
+            @if (task.lowPlatformBatchConfig.runAsUser) {
               <div class="detail-row">
-                <span class="label">Variáveis de Ambiente:</span>
-                <pre>{{ task.lowPlatformBatchConfig.environmentVariables }}</pre>
+                <span class="label">Usuário de Execução:</span>
+                <span>{{ task.lowPlatformBatchConfig.runAsUser }}</span>
+              </div>
+            }
+            @if (task.lowPlatformBatchConfig.onSuccess) {
+              <div class="detail-row">
+                <span class="label">Comando em Caso de Sucesso:</span>
+                <span>{{ task.lowPlatformBatchConfig.onSuccess }}</span>
+              </div>
+            }
+            @if (task.lowPlatformBatchConfig.onFailure) {
+              <div class="detail-row">
+                <span class="label">Comando em Caso de Falha:</span>
+                <span>{{ task.lowPlatformBatchConfig.onFailure }}</span>
               </div>
             }
           </div>
@@ -131,18 +211,62 @@
           <div class="detail-section">
             <h3>Configuração de Batch (Alta Plataforma)</h3>
             <div class="detail-row">
-              <span class="label">Tipo de Sistema:</span>
-              <span>{{ task.highPlatformBatchConfig.systemType }}</span>
+              <span class="label">Tipo de Endpoint:</span>
+              <span>{{ task.highPlatformBatchConfig.endpointType }}</span>
             </div>
             <div class="detail-row">
-              <span class="label">Nome do Job:</span>
-              <span>{{ task.highPlatformBatchConfig.jobName }}</span>
+              <span class="label">ID da Transação:</span>
+              <span>{{ task.highPlatformBatchConfig.transactionId }}</span>
             </div>
-            @if (task.highPlatformBatchConfig.parameters) {
-              <div class="detail-row">
-                <span class="label">Parâmetros:</span>
-                <pre>{{ task.highPlatformBatchConfig.parameters }}</pre>
-              </div>
+            <div class="detail-row">
+              <span class="label">Payload:</span>
+              <pre>{{ task.highPlatformBatchConfig.payload }}</pre>
+            </div>
+            <div class="detail-row">
+              <span class="label">Credenciais:</span>
+              <span>{{ task.highPlatformBatchConfig.credentials }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Timeout (segundos):</span>
+              <span>{{ task.highPlatformBatchConfig.timeout }}</span>
+            </div>
+            
+            <!-- Campos específicos para MQ -->
+            @if (task.highPlatformBatchConfig.endpointType === EndpointType.MQ) {
+              @if (task.highPlatformBatchConfig.channel) {
+                <div class="detail-row">
+                  <span class="label">Canal:</span>
+                  <span>{{ task.highPlatformBatchConfig.channel }}</span>
+                </div>
+              }
+              @if (task.highPlatformBatchConfig.queue) {
+                <div class="detail-row">
+                  <span class="label">Fila:</span>
+                  <span>{{ task.highPlatformBatchConfig.queue }}</span>
+                </div>
+              }
+            }
+            
+            <!-- Campos específicos para API -->
+            @if (task.highPlatformBatchConfig.endpointType === EndpointType.API) {
+              @if (task.highPlatformBatchConfig.host) {
+                <div class="detail-row">
+                  <span class="label">Host:</span>
+                  <span>{{ task.highPlatformBatchConfig.host }}</span>
+                </div>
+              }
+              @if (task.highPlatformBatchConfig.port) {
+                <div class="detail-row">
+                  <span class="label">Porta:</span>
+                  <span>{{ task.highPlatformBatchConfig.port }}</span>
+                </div>
+              }
+              @if (task.highPlatformBatchConfig.sslCertPath) {
+                <div class="detail-row">
+                  <span class="label">Caminho do Certificado SSL:</span>
+                  <span>{{ task.highPlatformBatchConfig.sslCertPath }}</span>
+                </div>
+              }
             }
           </div>
         }
@@ -156,17 +280,35 @@
               <span>{{ task.messagingTaskConfig.brokerType }}</span>
             </div>
             <div class="detail-row">
-              <span class="label">Destino:</span>
-              <span>{{ task.messagingTaskConfig.destination }}</span>
+              <span class="label">Nome do Destino:</span>
+              <span>{{ task.messagingTaskConfig.destinationName }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">URL de Conexão:</span>
+              <span>{{ task.messagingTaskConfig.connectionUrl }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Tipo de Autenticação:</span>
+              <span>{{ task.messagingTaskConfig.authType }}</span>
             </div>
             <div class="detail-row">
               <span class="label">Modo de Entrega:</span>
               <span>{{ task.messagingTaskConfig.deliveryMode }}</span>
             </div>
             <div class="detail-row">
-              <span class="label">Mensagem:</span>
-              <pre>{{ task.messagingTaskConfig.message }}</pre>
+              <span class="label">Headers:</span>
+              <pre>{{ task.messagingTaskConfig.headers }}</pre>
             </div>
+            <div class="detail-row">
+              <span class="label">Payload da Mensagem:</span>
+              <pre>{{ task.messagingTaskConfig.messagePayload }}</pre>
+            </div>
+            @if (task.messagingTaskConfig.retryPolicy) {
+              <div class="detail-row">
+                <span class="label">Política de Retry:</span>
+                <span>{{ task.messagingTaskConfig.retryPolicy }}</span>
+              </div>
+            }
           </div>
         }
       </mat-card-content>
