@@ -64,9 +64,28 @@
               <input matInput formControlName="cronExpression" placeholder="0 0 * * * ?">
               <mat-hint>Formato: segundo minuto hora dia-do-mês mês dia-da-semana</mat-hint>
               @if (taskForm.get('cronExpression')?.invalid && taskForm.get('cronExpression')?.touched) {
-                <mat-error>Expressão Cron é obrigatória</mat-error>
+                @if (taskForm.get('cronExpression')?.errors?.['required']) {
+                  <mat-error>Expressão Cron é obrigatória</mat-error>
+                } @else if (taskForm.get('cronExpression')?.errors?.['invalidCronExpression']) {
+                  <mat-error>Expressão Cron inválida. Use o formato Quartz (6 campos)</mat-error>
+                }
               }
             </mat-form-field>
+          </div>
+
+          <!-- Exemplos de expressões cron -->
+          <div class="cron-examples">
+            <p class="cron-examples-title">Exemplos de expressões cron:</p>
+            <div class="cron-examples-list">
+              @for (example of cronExamples; track example) {
+                <div class="cron-example-item">
+                  <button type="button" mat-stroked-button (click)="applyCronExample(example.value)">
+                    {{ example.value }}
+                  </button>
+                  <span class="cron-example-description">{{ example.description }}</span>
+                </div>
+              }
+            </div>
           </div>
           
           <div class="form-row two-columns">

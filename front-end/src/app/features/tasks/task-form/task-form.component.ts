@@ -27,6 +27,7 @@ import {
   DeliveryMode,
   EndpointType
 } from '../../../core/models/scheduled-task.model';
+import { cronExpressionValidator } from '../../../shared/validators/cron-validator';
 
 @Component({
   selector: 'app-task-form',
@@ -80,6 +81,15 @@ export class TaskFormComponent implements OnInit {
   deliveryModes = Object.values(DeliveryMode);
   endpointTypes = Object.values(EndpointType);
 
+  // Exemplos de expressões cron para ajudar o usuário
+  cronExamples = [
+    { value: '0 0 * * * ?', description: 'A cada hora' },
+    { value: '0 0/15 * * * ?', description: 'A cada 15 minutos' },
+    { value: '0 0 12 * * ?', description: 'Todos os dias às 12:00' },
+    { value: '0 0 0 * * ?', description: 'Todos os dias à meia-noite' },
+    { value: '0 0 0 ? * MON', description: 'Toda segunda-feira à meia-noite' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private taskService: TaskService,
@@ -117,7 +127,7 @@ export class TaskFormComponent implements OnInit {
       description: ['', [Validators.required]],
       taskType: [TaskType.REST_CALL, [Validators.required]],
       status: [TaskStatus.INACTIVE, [Validators.required]],
-      cronExpression: ['0 0 * * * ?', [Validators.required]],
+      cronExpression: ['0 0 * * * ?', [Validators.required, cronExpressionValidator()]],
       maxRetries: [0],
       retryDelaySeconds: [0],
       
@@ -340,6 +350,13 @@ export class TaskFormComponent implements OnInit {
       this.snackBar.open('Client ID e Client Secret são obrigatórios quando Token Endpoint não é fornecido', 'Fechar', { duration: 3000 });
       return false;
     }
+  }
+
+  // Método para aplicar um exemplo de expressão cron
+  applyCronExample(example: string): void {
+    this.taskForm.get('cronExpression')?.setValue(example);
+    this.taskForm.get('cronExpression')?.markAsDirty();
+    this.taskForm.get('cronExpression')?.updateValueAndValidity();
   }
 
   onSubmit(): void {
