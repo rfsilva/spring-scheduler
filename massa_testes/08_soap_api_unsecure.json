@@ -1,0 +1,17 @@
+{
+  "name": "SOAP API Unsecure - Local",
+  "description": "Chamada à nossa API SOAP não segura (soap-api-unsecure)",
+  "taskType": "SOAP_CALL",
+  "status": "INACTIVE",
+  "cronExpression": "0 */30 * * * ?",
+  "maxRetries": 3,
+  "retryDelaySeconds": 45,
+  "soapTaskConfig": {
+    "endpointUrl": "http://soap-api-unsecure:8082/ws/calculator",
+    "soapAction": "http://example.com/calculator/AddRequest",
+    "requestXml": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:cal=\"http://example.com/calculator\">\n   <soapenv:Header/>\n   <soapenv:Body>\n      <cal:AddRequest>\n         <cal:a>10</cal:a>\n         <cal:b>20</cal:b>\n      </cal:AddRequest>\n   </soapenv:Body>\n</soapenv:Envelope>",
+    "authType": "NONE",
+    "connectTimeoutSeconds": 15,
+    "readTimeoutSeconds": 15
+  }
+}

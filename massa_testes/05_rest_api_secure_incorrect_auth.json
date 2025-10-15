@@ -1,0 +1,20 @@
+{
+  "name": "REST API Secure - Credenciais Incorretas",
+  "description": "Chamada à nossa API REST segura (rest-api-secure) com credenciais incorretas",
+  "taskType": "REST_CALL",
+  "status": "INACTIVE",
+  "cronExpression": "0 0/20 * * * ?",
+  "maxRetries": 2,
+  "retryDelaySeconds": 60,
+  "restTaskConfig": {
+    "url": "http://rest-api-secure:8081/api/auth/signin",
+    "method": "POST",
+    "headers": "Content-Type: application/json\nAccept: application/json",
+    "body": "{\"username\":\"wrong_user\",\"password\":\"wrong_password\"}",
+    "authType": "BASIC",
+    "username": "wrong_user",
+    "password": "wrong_password",
+    "connectTimeoutSeconds": 15,
+    "readTimeoutSeconds": 15
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "REST API Unsecure - Local",
+  "description": "Chamada à nossa API REST não segura (rest-api-unsecure)",
+  "taskType": "REST_CALL",
+  "status": "INACTIVE",
+  "cronExpression": "0 */15 * * * ?",
+  "maxRetries": 3,
+  "retryDelaySeconds": 30,
+  "restTaskConfig": {
+    "url": "http://rest-api-unsecure:8080/api/tasks",
+    "method": "GET",
+    "headers": "Accept: application/json\nContent-Type: application/json",
+    "body": "",
+    "authType": "NONE",
+    "connectTimeoutSeconds": 10,
+    "readTimeoutSeconds": 10
+  }
+}

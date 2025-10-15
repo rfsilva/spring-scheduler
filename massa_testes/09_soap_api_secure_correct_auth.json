@@ -1,0 +1,19 @@
+{
+  "name": "SOAP API Secure - Credenciais Corretas",
+  "description": "Chamada à nossa API SOAP segura (soap-api-secure) com credenciais corretas",
+  "taskType": "SOAP_CALL",
+  "status": "INACTIVE",
+  "cronExpression": "0 0/45 * * * ?",
+  "maxRetries": 2,
+  "retryDelaySeconds": 60,
+  "soapTaskConfig": {
+    "endpointUrl": "http://soap-api-secure:8083/ws/calculator",
+    "soapAction": "http://example.com/calculator/secure/AddRequest",
+    "requestXml": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:cal=\"http://example.com/calculator/secure\">\n   <soapenv:Header>\n      <wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\" soapenv:mustUnderstand=\"1\">\n         <wsse:UsernameToken>\n            <wsse:Username>admin</wsse:Username>\n            <wsse:Password Type=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText\">admin123</wsse:Password>\n         </wsse:UsernameToken>\n      </wsse:Security>\n   </soapenv:Header>\n   <soapenv:Body>\n      <cal:AddRequest>\n         <cal:a>15</cal:a>\n         <cal:b>25</cal:b>\n      </cal:AddRequest>\n   </soapenv:Body>\n</soapenv:Envelope>",
+    "authType": "BASIC",
+    "username": "admin",
+    "password": "admin123",
+    "connectTimeoutSeconds": 20,
+    "readTimeoutSeconds": 20
+  }
+}

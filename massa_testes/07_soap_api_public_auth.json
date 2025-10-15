@@ -1,0 +1,19 @@
+{
+  "name": "SOAP API Pública com Auth - Global Weather Service",
+  "description": "Chamada a um serviço SOAP público com autenticação básica",
+  "taskType": "SOAP_CALL",
+  "status": "INACTIVE",
+  "cronExpression": "0 0 9 * * ?",
+  "maxRetries": 2,
+  "retryDelaySeconds": 90,
+  "soapTaskConfig": {
+    "endpointUrl": "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso",
+    "soapAction": "http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso/ListOfCountryNamesByCode",
+    "requestXml": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"http://www.oorsprong.org/websamples.countryinfo\">\n   <soapenv:Header/>\n   <soapenv:Body>\n      <web:ListOfCountryNamesByCode/>\n   </soapenv:Body>\n</soapenv:Envelope>",
+    "authType": "BASIC",
+    "username": "demo",
+    "password": "demo",
+    "connectTimeoutSeconds": 30,
+    "readTimeoutSeconds": 30
+  }
+}

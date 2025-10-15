@@ -1,0 +1,18 @@
+{
+  "name": "Batch Low Platform - Processamento de Dados",
+  "description": "Chamada ao nosso serviço batch de baixa plataforma",
+  "taskType": "LOW_PLATFORM_BATCH",
+  "status": "INACTIVE",
+  "cronExpression": "0 0 2 * * ?",
+  "maxRetries": 2,
+  "retryDelaySeconds": 120,
+  "lowPlatformBatchConfig": {
+    "command": "java -jar /app/batch-low-platform.jar",
+    "workingDirectory": "/opt/batch",
+    "environmentVariables": "SPRING_PROFILES_ACTIVE=batch\nBATCH_JOB_NAME=processJob",
+    "successExitCodes": "0",
+    "onSuccessCommand": "echo 'Batch processado com sucesso' >> /var/log/batch.log",
+    "onFailureCommand": "echo 'Falha no processamento do batch' >> /var/log/batch.log",
+    "timeoutSeconds": 300
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "Kafka - Envio de Mensagem",
+  "description": "Envio de mensagem para um tópico Kafka",
+  "taskType": "MESSAGING",
+  "status": "INACTIVE",
+  "cronExpression": "0 */10 * * * ?",
+  "maxRetries": 3,
+  "retryDelaySeconds": 60,
+  "messagingTaskConfig": {
+    "brokerType": "KAFKA",
+    "destination": "task-events",
+    "message": "{\n  \"taskId\": 1234,\n  \"eventType\": \"SCHEDULED\",\n  \"timestamp\": \"{{timestamp}}\",\n  \"details\": \"Tarefa agendada pelo sistema\"\n}",
+    "connectionProperties": "bootstrap.servers=kafka:9092\nkey.serializer=org.apache.kafka.common.serialization.StringSerializer\nvalue.serializer=org.apache.kafka.common.serialization.StringSerializer",
+    "authType": "NONE",
+    "deliveryMode": "PERSISTENT",
+    "timeoutSeconds": 30
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "SOAP API Pública - Serviço de Conversão de Temperatura",
+  "description": "Chamada a um serviço SOAP público para conversão de temperatura",
+  "taskType": "SOAP_CALL",
+  "status": "INACTIVE",
+  "cronExpression": "0 0 8 * * ?",
+  "maxRetries": 3,
+  "retryDelaySeconds": 60,
+  "soapTaskConfig": {
+    "endpointUrl": "https://www.w3schools.com/xml/tempconvert.asmx",
+    "soapAction": "https://www.w3schools.com/xml/CelsiusToFahrenheit",
+    "requestXml": "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:web=\"https://www.w3schools.com/xml/\">\n   <soapenv:Header/>\n   <soapenv:Body>\n      <web:CelsiusToFahrenheit>\n         <web:Celsius>25</web:Celsius>\n      </web:CelsiusToFahrenheit>\n   </soapenv:Body>\n</soapenv:Envelope>",
+    "authType": "NONE",
+    "connectTimeoutSeconds": 30,
+    "readTimeoutSeconds": 30
+  }
+}

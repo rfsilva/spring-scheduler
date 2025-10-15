@@ -1,0 +1,20 @@
+{
+  "name": "RabbitMQ - Envio de Mensagem",
+  "description": "Envio de mensagem para uma fila RabbitMQ",
+  "taskType": "MESSAGING",
+  "status": "INACTIVE",
+  "cronExpression": "0 */15 * * * ?",
+  "maxRetries": 3,
+  "retryDelaySeconds": 60,
+  "messagingTaskConfig": {
+    "brokerType": "RABBITMQ",
+    "destination": "task-queue",
+    "message": "{\n  \"taskId\": 5678,\n  \"action\": \"PROCESS\",\n  \"timestamp\": \"{{timestamp}}\",\n  \"priority\": \"HIGH\",\n  \"data\": {\n    \"customerId\": 12345,\n    \"orderId\": \"ORD-9876\"\n  }\n}",
+    "connectionProperties": "host=rabbitmq\nport=5672\nvirtualHost=/\nexchange=task-exchange\nroutingKey=task-routing-key",
+    "authType": "BASIC",
+    "username": "admin",
+    "password": "admin123",
+    "deliveryMode": "PERSISTENT",
+    "timeoutSeconds": 30
+  }
+}

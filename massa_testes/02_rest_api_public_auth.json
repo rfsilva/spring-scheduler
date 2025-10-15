@@ -1,0 +1,20 @@
+{
+  "name": "REST API Pública com Auth - NASA API",
+  "description": "Chamada à API pública da NASA com chave de API para demonstração",
+  "taskType": "REST_CALL",
+  "status": "INACTIVE",
+  "cronExpression": "0 0 12 * * ?",
+  "maxRetries": 2,
+  "retryDelaySeconds": 120,
+  "restTaskConfig": {
+    "url": "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY",
+    "method": "GET",
+    "headers": "Accept: application/json\nContent-Type: application/json",
+    "body": "",
+    "authType": "API_KEY",
+    "apiKeyName": "api_key",
+    "apiKeyValue": "DEMO_KEY",
+    "connectTimeoutSeconds": 30,
+    "readTimeoutSeconds": 30
+  }
+}
