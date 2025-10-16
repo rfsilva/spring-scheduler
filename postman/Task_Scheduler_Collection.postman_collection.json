@@ -1,0 +1,584 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Task Scheduler Collection",
+		"description": "Coleção de testes para o Task Scheduler, incluindo diferentes tipos de agendamento: REST, SOAP, BATCH e MENSAGERIA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "REST API",
+			"item": [
+				{
+					"name": "REST API Pública - Open Weather Map",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"REST API Pública - Open Weather Map\",\n  \"description\": \"Chamada à API pública do Open Weather Map para obter dados meteorológicos de uma cidade\",\n  \"taskType\": \"REST_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 0/30 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"restTaskConfig\": {\n    \"url\": \"https://api.openweathermap.org/data/2.5/weather?q=Sao%20Paulo&appid=439d4b804bc8187953eb36d2a8c26a02&units=metric\",\n    \"method\": \"GET\",\n    \"headers\": \"Accept: application/json\\nContent-Type: application/json\",\n    \"body\": \"\",\n    \"authType\": \"NONE\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar a API pública do Open Weather Map sem autenticação"
+					},
+					"response": []
+				},
+				{
+					"name": "REST API Pública com Auth - NASA API",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"REST API Pública - NASA API\",\n  \"description\": \"Chamada à API pública da NASA com chave de API para demonstração\",\n  \"taskType\": \"REST_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 15 8 * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"restTaskConfig\": {\n    \"url\": \"https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY\",\n    \"method\": \"GET\",\n    \"headers\": \"Accept: application/json\\nContent-Type: application/json\",\n    \"body\": \"\",\n    \"authType\": \"API_KEY\",\n    \"apiKeyName\": \"api_key\",\n    \"apiKeyValue\": \"DEMO_KEY\",\n    \"apiKeyLocation\": \"QUERY_PARAM\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar a API pública da NASA com chave de API"
+					},
+					"response": []
+				},
+				{
+					"name": "REST API Não Segura",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"REST API Não Segura - Lista de Tarefas\",\n  \"description\": \"Chamada à nossa API REST não segura para obter a lista de tarefas\",\n  \"taskType\": \"REST_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 */20 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"restTaskConfig\": {\n    \"url\": \"{{rest_api_unsecure_url}}/api/tasks\",\n    \"method\": \"GET\",\n    \"headers\": \"Accept: application/json\\nContent-Type: application/json\",\n    \"body\": \"\",\n    \"authType\": \"NONE\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar nossa API REST não segura"
+					},
+					"response": []
+				},
+				{
+					"name": "REST API Segura - Credenciais Corretas",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"REST API Segura - Credenciais Corretas\",\n  \"description\": \"Chamada à nossa API REST segura com credenciais corretas\",\n  \"taskType\": \"REST_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 */30 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"restTaskConfig\": {\n    \"url\": \"{{rest_api_secure_url}}/api/secure/tasks\",\n    \"method\": \"GET\",\n    \"headers\": \"Accept: application/json\\nContent-Type: application/json\",\n    \"body\": \"\",\n    \"authType\": \"BASIC\",\n    \"username\": \"{{admin_username}}\",\n    \"password\": \"{{admin_password}}\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar nossa API REST segura com credenciais corretas"
+					},
+					"response": []
+				},
+				{
+					"name": "REST API Segura - Credenciais Incorretas",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"REST API Segura - Credenciais Incorretas\",\n  \"description\": \"Chamada à nossa API REST segura com credenciais incorretas\",\n  \"taskType\": \"REST_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 45 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"restTaskConfig\": {\n    \"url\": \"{{rest_api_secure_url}}/api/secure/tasks\",\n    \"method\": \"GET\",\n    \"headers\": \"Accept: application/json\\nContent-Type: application/json\",\n    \"body\": \"\",\n    \"authType\": \"BASIC\",\n    \"username\": \"{{invalid_username}}\",\n    \"password\": \"{{invalid_password}}\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar nossa API REST segura com credenciais incorretas"
+					},
+					"response": []
+				}
+			],
+			"description": "Testes para agendamento de chamadas REST API"
+		},
+		{
+			"name": "SOAP API",
+			"item": [
+				{
+					"name": "SOAP API Pública - Serviço de Conversão de Temperatura",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"SOAP API Pública - Serviço de Conversão de Temperatura\",\n  \"description\": \"Chamada a um serviço SOAP público para conversão de temperatura\",\n  \"taskType\": \"SOAP_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 0 8 * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"soapTaskConfig\": {\n    \"endpointUrl\": \"https://www.w3schools.com/xml/tempconvert.asmx\",\n    \"soapAction\": \"https://www.w3schools.com/xml/CelsiusToFahrenheit\",\n    \"requestXml\": \"<soapenv:Envelope xmlns:soapenv=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" xmlns:web=\\\"https://www.w3schools.com/xml/\\\">\\n   <soapenv:Header/>\\n   <soapenv:Body>\\n      <web:CelsiusToFahrenheit>\\n         <web:Celsius>25</web:Celsius>\\n      </web:CelsiusToFahrenheit>\\n   </soapenv:Body>\\n</soapenv:Envelope>\",\n    \"authType\": \"NONE\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar um serviço SOAP público de conversão de temperatura"
+					},
+					"response": []
+				},
+				{
+					"name": "SOAP API Pública com Auth - Lista de Países",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"SOAP API Pública com Auth - Lista de Países\",\n  \"description\": \"Chamada a um serviço SOAP público com autenticação básica para listar países\",\n  \"taskType\": \"SOAP_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 15 9 * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"soapTaskConfig\": {\n    \"endpointUrl\": \"http://webservices.oorsprong.org/websamples.countryinfo/CountryInfoService.wso\",\n    \"soapAction\": \"http://www.oorsprong.org/websamples.countryinfo/ListOfCountryNamesByCode\",\n    \"requestXml\": \"<soapenv:Envelope xmlns:soapenv=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" xmlns:web=\\\"http://www.oorsprong.org/websamples.countryinfo\\\">\\n   <soapenv:Header/>\\n   <soapenv:Body>\\n      <web:ListOfCountryNamesByCode/>\\n   </soapenv:Body>\\n</soapenv:Envelope>\",\n    \"authType\": \"BASIC\",\n    \"username\": \"{{admin_username}}\",\n    \"password\": \"{{admin_password}}\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar um serviço SOAP público com autenticação básica"
+					},
+					"response": []
+				},
+				{
+					"name": "SOAP API Não Segura - Operação de Adição",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"SOAP API Não Segura - Operação de Adição\",\n  \"description\": \"Chamada à nossa API SOAP não segura para realizar uma operação de adição\",\n  \"taskType\": \"SOAP_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 */25 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"soapTaskConfig\": {\n    \"endpointUrl\": \"{{soap_api_unsecure_url}}/ws/calculator\",\n    \"soapAction\": \"http://example.org/calculator/Add\",\n    \"requestXml\": \"<soapenv:Envelope xmlns:soapenv=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" xmlns:cal=\\\"http://example.org/calculator\\\">\\n   <soapenv:Header/>\\n   <soapenv:Body>\\n      <cal:AddRequest>\\n         <cal:a>10</cal:a>\\n         <cal:b>20</cal:b>\\n      </cal:AddRequest>\\n   </soapenv:Body>\\n</soapenv:Envelope>\",\n    \"authType\": \"NONE\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar nossa API SOAP não segura"
+					},
+					"response": []
+				},
+				{
+					"name": "SOAP API Segura - Credenciais Corretas",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"SOAP API Segura - Credenciais Corretas\",\n  \"description\": \"Chamada à nossa API SOAP segura com credenciais corretas\",\n  \"taskType\": \"SOAP_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 */35 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"soapTaskConfig\": {\n    \"endpointUrl\": \"{{soap_api_secure_url}}/ws/secure/calculator\",\n    \"soapAction\": \"http://example.org/calculator/Add\",\n    \"requestXml\": \"<soapenv:Envelope xmlns:soapenv=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" xmlns:cal=\\\"http://example.org/calculator\\\">\\n   <soapenv:Header/>\\n   <soapenv:Body>\\n      <cal:AddRequest>\\n         <cal:a>15</cal:a>\\n         <cal:b>25</cal:b>\\n      </cal:AddRequest>\\n   </soapenv:Body>\\n</soapenv:Envelope>\",\n    \"authType\": \"BASIC\",\n    \"username\": \"{{admin_username}}\",\n    \"password\": \"{{admin_password}}\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar nossa API SOAP segura com credenciais corretas"
+					},
+					"response": []
+				},
+				{
+					"name": "SOAP API Segura - Credenciais Incorretas",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"SOAP API Segura - Credenciais Incorretas\",\n  \"description\": \"Chamada à nossa API SOAP segura com credenciais incorretas\",\n  \"taskType\": \"SOAP_CALL\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 50 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"soapTaskConfig\": {\n    \"endpointUrl\": \"{{soap_api_secure_url}}/ws/secure/calculator\",\n    \"soapAction\": \"http://example.org/calculator/Add\",\n    \"requestXml\": \"<soapenv:Envelope xmlns:soapenv=\\\"http://schemas.xmlsoap.org/soap/envelope/\\\" xmlns:cal=\\\"http://example.org/calculator\\\">\\n   <soapenv:Header/>\\n   <soapenv:Body>\\n      <cal:AddRequest>\\n         <cal:a>15</cal:a>\\n         <cal:b>25</cal:b>\\n      </cal:AddRequest>\\n   </soapenv:Body>\\n</soapenv:Envelope>\",\n    \"authType\": \"BASIC\",\n    \"username\": \"{{invalid_username}}\",\n    \"password\": \"{{invalid_password}}\",\n    \"connectTimeoutSeconds\": 30,\n    \"readTimeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para chamar nossa API SOAP segura com credenciais incorretas"
+					},
+					"response": []
+				}
+			],
+			"description": "Testes para agendamento de chamadas SOAP API"
+		},
+		{
+			"name": "BATCH",
+			"item": [
+				{
+					"name": "Batch Low Platform - Processamento de Dados",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Batch Low Platform - Processamento de Dados\",\n  \"description\": \"Chamada ao nosso serviço batch de baixa plataforma\",\n  \"taskType\": \"LOW_PLATFORM_BATCH\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 0 2 * * ?\",\n  \"maxRetries\": 2,\n  \"retryDelaySeconds\": 120,\n  \"lowPlatformBatchConfig\": {\n    \"command\": \"java -jar /app/batch-low-platform.jar\",\n    \"workingDirectory\": \"/opt/batch\",\n    \"environmentVariables\": \"SPRING_PROFILES_ACTIVE=batch\\nBATCH_JOB_NAME=processJob\",\n    \"successExitCodes\": \"0\",\n    \"onSuccessCommand\": \"echo 'Batch processado com sucesso' >> /var/log/batch.log\",\n    \"onFailureCommand\": \"echo 'Falha no processamento do batch' >> /var/log/batch.log\",\n    \"timeoutSeconds\": 300\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para executar um batch de baixa plataforma"
+					},
+					"response": []
+				}
+			],
+			"description": "Testes para agendamento de processos batch"
+		},
+		{
+			"name": "MENSAGERIA",
+			"item": [
+				{
+					"name": "Kafka - Envio de Mensagem",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Kafka - Envio de Mensagem\",\n  \"description\": \"Envio de mensagem para um tópico Kafka\",\n  \"taskType\": \"MESSAGING\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 */10 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"messagingTaskConfig\": {\n    \"brokerType\": \"KAFKA\",\n    \"destination\": \"task-events\",\n    \"message\": \"{\\n  \\\"taskId\\\": 1234,\\n  \\\"eventType\\\": \\\"SCHEDULED\\\",\\n  \\\"timestamp\\\": \\\"{{timestamp}}\\\",\\n  \\\"details\\\": \\\"Tarefa agendada pelo sistema\\\"\\n}\",\n    \"connectionProperties\": \"bootstrap.servers={{kafka_broker}}\\nkey.serializer=org.apache.kafka.common.serialization.StringSerializer\\nvalue.serializer=org.apache.kafka.common.serialization.StringSerializer\",\n    \"authType\": \"NONE\",\n    \"deliveryMode\": \"PERSISTENT\",\n    \"timeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para enviar mensagem para um tópico Kafka"
+					},
+					"response": []
+				},
+				{
+					"name": "RabbitMQ - Envio de Mensagem",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"RabbitMQ - Envio de Mensagem\",\n  \"description\": \"Envio de mensagem para uma fila RabbitMQ\",\n  \"taskType\": \"MESSAGING\",\n  \"status\": \"INACTIVE\",\n  \"cronExpression\": \"0 */15 * * * ?\",\n  \"maxRetries\": 3,\n  \"retryDelaySeconds\": 60,\n  \"messagingTaskConfig\": {\n    \"brokerType\": \"RABBITMQ\",\n    \"destination\": \"task-queue\",\n    \"message\": \"{\\n  \\\"taskId\\\": 5678,\\n  \\\"eventType\\\": \\\"EXECUTED\\\",\\n  \\\"timestamp\\\": \\\"{{timestamp}}\\\",\\n  \\\"details\\\": \\\"Tarefa executada com sucesso\\\"\\n}\",\n    \"connectionProperties\": \"host={{rabbitmq_host}}\\nport={{rabbitmq_port}}\\nvirtualHost=/\",\n    \"authType\": \"BASIC\",\n    \"username\": \"{{rabbitmq_username}}\",\n    \"password\": \"{{rabbitmq_password}}\",\n    \"deliveryMode\": \"PERSISTENT\",\n    \"timeoutSeconds\": 30\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Cria uma tarefa para enviar mensagem para uma fila RabbitMQ"
+					},
+					"response": []
+				}
+			],
+			"description": "Testes para agendamento de envio de mensagens"
+		},
+		{
+			"name": "Gerenciamento de Tarefas",
+			"item": [
+				{
+					"name": "Listar Todas as Tarefas",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks"
+							]
+						},
+						"description": "Lista todas as tarefas cadastradas no sistema"
+					},
+					"response": []
+				},
+				{
+					"name": "Obter Tarefa por ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}"
+							]
+						},
+						"description": "Obtém os detalhes de uma tarefa específica pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Ativar Tarefa",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}/activate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}",
+								"activate"
+							]
+						},
+						"description": "Ativa uma tarefa específica pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Desativar Tarefa",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}/deactivate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}",
+								"deactivate"
+							]
+						},
+						"description": "Desativa uma tarefa específica pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Executar Tarefa Imediatamente",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}/execute",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}",
+								"execute"
+							]
+						},
+						"description": "Executa uma tarefa imediatamente, independente do agendamento"
+					},
+					"response": []
+				},
+				{
+					"name": "Excluir Tarefa",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}"
+							]
+						},
+						"description": "Exclui uma tarefa específica pelo ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Histórico de Execuções",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/tasks/{{taskId}}/executions?startDate={{startDate}}&endDate={{endDate}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"tasks",
+								"{{taskId}}",
+								"executions"
+							],
+							"query": [
+								{
+									"key": "startDate",
+									"value": "{{startDate}}"
+								},
+								{
+									"key": "endDate",
+									"value": "{{endDate}}"
+								}
+							]
+						},
+						"description": "Obtém o histórico de execuções de uma tarefa específica"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints para gerenciamento de tarefas"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
